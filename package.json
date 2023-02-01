@@ -6,8 +6,8 @@
   "author": "DZRJLJ + IZRK",
   "private": true,
   "scripts": {
-    "lint": "eslint --ext .js,.vue ./",
-    "test": "echo \"No test specified\" && exit 0"
+    "dev": "quasar dev",
+    "mobile": "quasar dev -m cordova -T android"
   },
   "dependencies": {
     "@quasar/extras": "^1.0.0",

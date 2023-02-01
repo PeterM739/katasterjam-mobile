@@ -2,32 +2,25 @@
 
 Aplikacija za terensko delo popisa jam
 
+## Install Cordova
+Follow instructions here (chapter #1): https://quasar.dev/quasar-cli-vite/developing-cordova-apps/preparation
+
+(install Android Studio, set up PATH, etc... you can skip chapters #2, #3 and #4 - they are already done)
+```bash
+npm install -g cordova
+# check if everything is set up correctly
+cd src-cordova
+cordova requirements
+```
+
 ## Install the dependencies
 ```bash
-yarn
-# or
 npm install
 ```
 
-### Start the app in development mode (hot-code reloading, error reporting, etc.)
+### Start the app in development mode
 ```bash
-quasar dev
+npm run dev
+# or run cordova in dev mode
+npm run mobile
 ```
-
-
-### Lint the files
-```bash
-yarn lint
-# or
-npm run lint
-```
-
-
-
-### Build the app for production
-```bash
-quasar build
-```
-
-### Customize the configuration
-See [Configuring quasar.config.js](https://v2.quasar.dev/quasar-cli-vite/quasar-config-js).
