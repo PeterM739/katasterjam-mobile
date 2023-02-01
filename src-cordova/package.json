@@ -14,11 +14,21 @@
   "license": "Apache-2.0",
   "devDependencies": {
     "cordova-android": "^9.1.0",
+    "cordova-background-geolocation-plugin": "^2.0.8",
     "cordova-plugin-whitelist": "^1.3.4"
   },
   "cordova": {
     "plugins": {
-      "cordova-plugin-whitelist": {}
+      "cordova-plugin-whitelist": {},
+      "cordova-background-geolocation-plugin": {
+        "GOOGLE_PLAY_SERVICES_VERSION": "11+",
+        "ICON": "@mipmap/ic_launcher",
+        "SMALL_ICON": "@mipmap/ic_launcher",
+        "ACCOUNT_NAME": "@string/app_name",
+        "ACCOUNT_LABEL": "@string/app_name",
+        "ACCOUNT_TYPE": "$PACKAGE_NAME.account",
+        "CONTENT_AUTHORITY": "$PACKAGE_NAME"
+      }
     },
     "platforms": [
       "android"

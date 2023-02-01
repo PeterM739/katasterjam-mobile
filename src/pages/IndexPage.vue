@@ -49,6 +49,44 @@ export default defineComponent({
     }
   },
   methods: {
+    startTracking () {
+      if (this.$q.platform.is.cordova) {
+        try {
+          window.BackgroundGeolocation.configure({
+            locationProvider: window.BackgroundGeolocation.DISTANCE_FILTER_PROVIDER,
+            desiredAccuracy: window.BackgroundGeolocation.HIGH_ACCURACY,
+            stationaryRadius: 10,
+            distanceFilter: 10,
+            stopOnTerminate: false,
+            notificationTitle: 'Location tracking',
+            notificationText: 'Vaša lokacija se beleži v ozadju',
+            debug: false,
+            httpHeaders: { 'X-Auth': 'če ga rabiš' },
+            interval: 60000,
+            fastestInterval: 10000,
+            activitiesInterval: 30000,
+            url: 'https://katasterjam.si/api/track',
+            syncUrl: 'https://katasterjam.si/api/sync'
+          })
+
+          window.BackgroundGeolocation.on('authorization', (status) => {
+            if (status !== window.BackgroundGeolocation.AUTHORIZED) {
+              setTimeout(() => {
+                navigator.notification.confirm('Prosimo vključite dostop do lokacije', b => {
+                  if (b === 1) {
+                    window.BackgroundGeolocation.showAppSettings()
+                  }
+                }, 'Kataster jam')
+              }, 1000)
+            }
+          })
+
+          window.BackgroundGeolocation.start()
+        } catch (e) {
+          console.error(e)
+        }
+      }
+    },
     zoomChanged (currentZoom) {
       this.currentZoom = currentZoom
     },
