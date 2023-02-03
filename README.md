@@ -8,14 +8,17 @@ Follow instructions here (chapter #1): https://quasar.dev/quasar-cli-vite/develo
 (install Android Studio, set up PATH, etc... you can skip chapters #2, #3 and #4 - they are already done)
 ```bash
 npm install -g cordova
-# check if everything is set up correctly
-cd src-cordova
-cordova requirements
 ```
 
 ## Install the dependencies
 ```bash
 npm install
+# install cordova dependencies
+cd src-cordova
+cordova platform add android@11
+npm install
+# check if everything is set up correctly
+cordova requirements
 ```
 
 ### Start the app in development mode
@@ -23,4 +26,12 @@ npm install
 npm run dev
 # or run cordova in dev mode
 npm run mobile
+```
+
+### Build the app for production
+```bash
+# build full android package
+npm run build-mobile
+# only update www files (faster)
+npm run mobile-update
 ```

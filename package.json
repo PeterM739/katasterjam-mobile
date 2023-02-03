@@ -7,7 +7,9 @@
   "private": true,
   "scripts": {
     "dev": "quasar dev",
-    "mobile": "quasar dev -m cordova -T android"
+    "mobile": "quasar dev -m cordova -T android",
+    "mobile-update": "quasar build -m android --skip-pkg",
+    "build-mobile": "quasar build -m android"
   },
   "dependencies": {
     "@quasar/extras": "^1.0.0",
