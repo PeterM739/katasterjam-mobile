@@ -4,40 +4,45 @@
 
       <ol-view
         ref="view"
+        :enableRotation="false"
         :center="center"
-        :rotation="rotation"
         :zoom="zoom"
         :projection="projection"
         @zoomChanged="zoomChanged"
         @centerChanged="centerChanged"
-        @resolutionChanged="resolutionChanged"
-        @rotationChanged="rotationChanged" />
-
-      <ol-tile-layer>
-        <ol-source-osm />
-      </ol-tile-layer>
-
+        @resolutionChanged="resolutionChanged"/>
+      <CartoLayers/>
+      <LocationLayers ref="childComponentRef" :view="view"/>
     </ol-map>
+
+    <q-page-sticky position="bottom-right" :offset="[18, 18]">
+      <q-btn fab :icon="btnIcon" color="accent" @click="buttonClicked" />
+    </q-page-sticky>
   </PageFullScreen>
 </template>
 
 <script>
 import { ref, defineComponent } from 'vue'
 import PageFullScreen from 'layouts/PageFullScreen.vue'
-
+import CartoLayers from 'src/components/map/layers/CartoLayers.vue'
+import LocationLayers from 'src/components/map/layers/LocationLayers.vue'
 export default defineComponent({
   name: 'IndexPage',
-  components: { PageFullScreen },
+  components: { PageFullScreen, CartoLayers, LocationLayers },
   setup () {
     const center = ref([1637531.7171455352, 5766419.270826726])
     const projection = ref('EPSG:3857')
     const zoom = ref(8)
-    const rotation = ref(0)
+
+    const childComponentRef = ref(null)
+
+    const view = ref('')
     return {
       center,
       projection,
       zoom,
-      rotation
+      view,
+      childComponentRef
     }
   },
   data () {
@@ -45,50 +50,19 @@ export default defineComponent({
       currentCenter: this.center,
       currentZoom: this.zoom,
       currentResolution: this.resolution,
-      currentRotation: this.rotation
+      btnIcon: 'radio_button_checked'
     }
   },
   methods: {
-    startTracking () {
-      if (this.$q.platform.is.cordova) {
-        try {
-          window.BackgroundGeolocation.configure({
-            locationProvider: window.BackgroundGeolocation.DISTANCE_FILTER_PROVIDER,
-            desiredAccuracy: window.BackgroundGeolocation.HIGH_ACCURACY,
-            stationaryRadius: 10,
-            distanceFilter: 10,
-            stopOnTerminate: false,
-            notificationTitle: 'Location tracking',
-            notificationText: 'Vaša lokacija se beleži v ozadju',
-            debug: false,
-            httpHeaders: { 'X-Auth': 'če ga rabiš' },
-            interval: 60000,
-            fastestInterval: 10000,
-            activitiesInterval: 30000,
-            url: 'https://katasterjam.si/api/track',
-            syncUrl: 'https://katasterjam.si/api/sync'
-          })
-
-          window.BackgroundGeolocation.on('authorization', (status) => {
-            if (status !== window.BackgroundGeolocation.AUTHORIZED) {
-              setTimeout(() => {
-                navigator.notification.confirm('Prosimo vključite dostop do lokacije', b => {
-                  if (b === 1) {
-                    window.BackgroundGeolocation.showAppSettings()
-                  }
-                }, 'Kataster jam')
-              }, 1000)
-            }
-          })
-
-          window.BackgroundGeolocation.start()
-        } catch (e) {
-          console.error(e)
-        }
-      }
-    },
     zoomChanged (currentZoom) {
       this.currentZoom = currentZoom
+    },
+    buttonClicked (evt) {
+      this.locationTrackingStarted = !this.locationTrackingStarted
+
+      this.btnIcon = this.locationTrackingStarted ? 'stop_circle' : 'radio_button_checked'
+
+      this.childComponentRef.startTracking(this.locationTrackingStarted)
     },
     resolutionChanged (resolution) {
       this.currentResolution = resolution
@@ -96,9 +70,6 @@ export default defineComponent({
     centerChanged (center) {
       this.currentCenter = center
       console.info(center)
-    },
-    rotationChanged (rotation) {
-      this.currentRotation = rotation
     }
   }
 })
