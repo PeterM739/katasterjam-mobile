@@ -62,7 +62,9 @@ export default {
             stopOnTerminate: false,
             notificationTitle: 'Location tracking',
             notificationText: 'Vaša lokacija se beleži v ozadju',
-            debug: false,
+            debug: true,
+            startForeground: true,
+            notificationsEnabled: true,
             httpHeaders: { 'X-Auth': 'če ga rabiš' },
             interval: 5000, // only when using location provider: ACTIVITY_PROVIDER
             fastestInterval: 2000, // only when using location provider: ACTIVITY_PROVIDER
