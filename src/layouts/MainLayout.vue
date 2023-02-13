@@ -33,7 +33,12 @@
             <q-item-label>Some link here</q-item-label>
           </q-item-section>
         </q-item>
-
+        <q-item clickable v-ripple @click.once="logOutButton">
+          <q-item-section avatar>
+            <q-icon name="logout" />
+          </q-item-section>
+          <q-item-section>Log out</q-item-section>
+        </q-item>
       </q-list>
     </q-drawer>
 
@@ -45,6 +50,7 @@
 
 <script>
 import { defineComponent, ref } from 'vue'
+import { useAuthStore } from 'stores/auth-store'
 
 export default defineComponent({
   name: 'MainLayout',
@@ -52,12 +58,23 @@ export default defineComponent({
   components: {},
 
   setup () {
+    const store = useAuthStore()
     const leftDrawerOpen = ref(false)
 
     return {
+      store,
       leftDrawerOpen,
       toggleLeftDrawer () {
         leftDrawerOpen.value = !leftDrawerOpen.value
+      }
+    }
+  },
+  methods: {
+    async logOutButton () {
+      try {
+        await this.store.logOut()
+      } finally {
+        this.$router.replace('/login')
       }
     }
   }
