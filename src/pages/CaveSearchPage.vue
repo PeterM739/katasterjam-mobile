@@ -1,7 +1,6 @@
 <template>
   <q-input
     v-model="query"
-    @update:model-value="executeSearch"
     debounce="500"
     filled
     placeholder="Search"
@@ -80,11 +79,6 @@ export default {
       closeSlider: null
     }
   },
-  data () {
-    return {
-      locationBtnColor: ''
-    }
-  },
   computed: {
     caves () {
       return this.store.getCaves
@@ -97,6 +91,11 @@ export default {
     },
     currentSort () {
       return this.store.getCurrentSort
+    }
+  },
+  watch: {
+    query (newQuery, oldQuery) {
+      this.executeSearch()
     }
   },
   methods: {
@@ -148,7 +147,6 @@ export default {
 
         return
       }
-      this.locationBtnColor = 'light-green'
       if (this.$q.platform.is.cordova) {
         window.BackgroundGeolocation.getCurrentLocation(async (location) => {
           this.query = ''
