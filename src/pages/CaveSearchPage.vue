@@ -22,6 +22,7 @@
         <q-item clickable @click="caveClick(cave.caveNumber)">
           <q-item-section avatar top>
             <q-avatar icon="info" color="primary" text-color="white" />
+            <q-icon name="keyboard_double_arrow_right" size="lg" color="primary"></q-icon>
           </q-item-section>
 
           <q-item-section>
