@@ -14,7 +14,8 @@
   "license": "Apache-2.0",
   "devDependencies": {
     "cordova-android": "^11.0.0",
-    "cordova-background-geolocation-plugin": "^2.0.8"
+    "cordova-background-geolocation-plugin": "^2.0.8",
+    "cordova-plugin-geolocation": "^4.1.0"
   },
   "cordova": {
     "platforms": [
@@ -29,6 +30,10 @@
         "ACCOUNT_LABEL": "@string/app_name",
         "ACCOUNT_TYPE": "$PACKAGE_NAME.account",
         "CONTENT_AUTHORITY": "$PACKAGE_NAME"
+      },
+      "cordova-plugin-device-orientation": {},
+      "cordova-plugin-geolocation": {
+        "GPS_REQUIRED": "true"
       }
     }
   }

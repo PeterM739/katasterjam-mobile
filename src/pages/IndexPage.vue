@@ -12,7 +12,7 @@
         @centerChanged="centerChanged"
         @resolutionChanged="resolutionChanged"/>
       <CartoLayers/>
-      <LocationLayers ref="childComponentRef" :view="view"/>
+      <LocationLayers :view="view"/>
 
       <ol-vector-layer>
         <ol-source-vector :features="markLocations">
@@ -20,8 +20,14 @@
       </ol-vector-layer>
     </ol-map>
 
+    <q-page-sticky position="bottom-left" :offset="[18, 18]">
+      <q-btn fab :icon="isCenterFixed ? 'my_location' : 'location_searching'" color="accent" @click="myLocationClicked" />
+    </q-page-sticky>
     <q-page-sticky position="bottom-right" :offset="[18, 18]">
-      <q-btn fab :icon="btnIcon" color="accent" @click="buttonClicked" />
+      <q-btn fab :icon="trackLocationIcon ? 'stop_circle' : 'play_arrow'" color="accent" @click="trackingClicked" />
+    </q-page-sticky>
+    <q-page-sticky position="bottom-right" :offset="[18, 90]" v-if="navigationActive">
+      <q-btn fab icon="stop_circle" color="red" @click="stopNavigation"/>
     </q-page-sticky>
   </PageFullScreen>
 </template>
@@ -34,25 +40,27 @@ import { Feature } from 'ol'
 import PageFullScreen from 'layouts/PageFullScreen.vue'
 import CartoLayers from 'src/components/map/layers/CartoLayers.vue'
 import LocationLayers from 'src/components/map/layers/LocationLayers.vue'
+import { useLocationStore } from 'stores/location-store'
 export default defineComponent({
   name: 'IndexPage',
   components: { PageFullScreen, CartoLayers, LocationLayers },
   setup () {
+    const store = useLocationStore()
     const center = ref([1637531, 5766419])
     const projection = ref('EPSG:3857')
     const zoom = ref(8)
     const markLocations = ref([])
-
-    const childComponentRef = ref(null)
+    const goTo = ref(null)
 
     const view = ref('')
     return {
+      store,
       center,
       projection,
       zoom,
       view,
-      childComponentRef,
-      markLocations
+      markLocations,
+      goTo
     }
   },
   data () {
@@ -62,31 +70,60 @@ export default defineComponent({
       this.markLocations = [mark]
       this.center = coords
       this.zoom = 15
+      this.goTo = this.$route.query.navigate ? mark : null
     }
 
     return {
       currentCenter: this.center,
       currentZoom: this.zoom,
       currentResolution: this.resolution,
-      btnIcon: 'radio_button_checked'
+      fixedCenter: false
+    }
+  },
+  computed: {
+    trackLocationIcon () {
+      return this.store.getLocationTracking
+    },
+    navigationActive () {
+      return this.store.getNavigationActive
+    },
+    isCenterFixed () {
+      return this.fixedCenter
     }
   },
   methods: {
     zoomChanged (currentZoom) {
       this.currentZoom = currentZoom
     },
-    buttonClicked (evt) {
-      this.locationTrackingStarted = !this.locationTrackingStarted
-
-      this.btnIcon = this.locationTrackingStarted ? 'stop_circle' : 'radio_button_checked'
-
-      this.childComponentRef.startTracking(this.locationTrackingStarted)
+    trackingClicked (evt) {
+      this.store.toggleLocationTracking()
+    },
+    myLocationClicked (evt) {
+      this.center = this.store.getMyLocationCoordinates
+      this.fixedCenter = true
+      this.zoom = this.zoom < 15 ? 15 : this.currentZoom
     },
     resolutionChanged (resolution) {
       this.currentResolution = resolution
     },
     centerChanged (center) {
       this.currentCenter = center
+      if (this.view.getInteracting()) {
+        this.fixedCenter = false
+      } else if (this.fixedCenter) {
+        this.center = center
+      }
+    },
+    stopNavigation () {
+      this.store.stopNavigation()
+    }
+  },
+  watch: {
+    view (newVal, oldVal) {
+      this.store.initialize(newVal.getProjection())
+      if (this.goTo) {
+        this.store.startNavigation(this.goTo)
+      }
     }
   }
 })

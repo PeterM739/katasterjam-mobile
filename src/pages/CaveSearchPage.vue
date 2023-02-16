@@ -102,13 +102,10 @@ export default {
   methods: {
     goTo ({ reset }, cave) {
       reset()
-      console.log('go to cave (TODO): ', cave)
       this.selectedCave = cave
       this.confirm = true
     },
     navigateToSelectedCave () {
-      console.log('navigateToSelectedCave to cave (TODO): ', this.selectedCave)
-
       this.$router.push({
         path: '/',
         query: {
