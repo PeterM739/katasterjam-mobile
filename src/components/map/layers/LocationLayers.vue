@@ -21,6 +21,7 @@ import NavigationLayer from './NavigationLayer.vue'
 import { useLocationStore } from 'stores/location-store'
 export default {
   props: ['view'],
+  emits: ['centerChanged'],
   components: { TrackingLayer, NavigationLayer },
   setup () {
     const store = useLocationStore()
@@ -50,6 +51,7 @@ export default {
       return this.store.getMyLocation
     },
     myLocationCoordinates () {
+      this.$emit('centerChanged', this.store.getMyLocationCoordinates)
       return this.store.getMyLocationCoordinates
     }
   }

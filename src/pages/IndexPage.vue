@@ -12,7 +12,9 @@
         @centerChanged="centerChanged"
         @resolutionChanged="resolutionChanged"/>
       <CartoLayers/>
-      <LocationLayers :view="view"/>
+      <LocationLayers
+        :view="view"
+        @centerChanged="centerChanged"/>
 
       <ol-vector-layer>
         <ol-source-vector :features="markLocations">
@@ -107,6 +109,9 @@ export default defineComponent({
       this.currentResolution = resolution
     },
     centerChanged (center) {
+      if (this.view === '') {
+        return
+      }
       this.currentCenter = center
       if (this.view.getInteracting()) {
         this.fixedCenter = false

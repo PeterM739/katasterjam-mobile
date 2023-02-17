@@ -42,7 +42,7 @@ export const useLocationStore = defineStore('location', {
     getNavigateTo (state) {
       return state.navigateTo
     },
-    getIsLocationNeeded (state) {
+    foregroundNotNeeded (state) {
       return !state.locationTracking && !state.navigationActive
     }
   },
@@ -83,9 +83,6 @@ export const useLocationStore = defineStore('location', {
           this.locationUpdates.map(update => update.locationUpdated(location, this.projection))
         })
 
-        navigator.geolocation.watchPosition((position) => {
-          this.locationUpdates.map(update => update.locationUpdated(position.coords, this.projection))
-        })
         this.watchId = navigator.compass.watchHeading((heading) => {
           this.rotation = heading.magneticHeading
         }, (compassError) => {
@@ -94,13 +91,26 @@ export const useLocationStore = defineStore('location', {
           frequency: 1000
         })
       }
+      navigator.geolocation.watchPosition((position) => {
+        if (this.foregroundLocationActivated && position.coords.accuracy > 10 && this.isCordova) {
+          return
+        }
+
+        this.locationUpdates.map(update => update.locationUpdated(position.coords, this.projection))
+      }, (code, message) => {
+        console.error('Error when trying to fetch location', code, message)
+      }, {
+        enableHighAccuracy: true
+      })
     },
     toggleLocationTracking () {
       this.locationTracking = !this.locationTracking
-      window.BackgroundGeolocation.configure({
-        notificationTitle: 'Location tracking',
-        notificationText: 'Tracking your location is in progress'
-      })
+      if (this.isCordova) {
+        window.BackgroundGeolocation.configure({
+          notificationTitle: 'Location tracking',
+          notificationText: 'Tracking your location is in progress'
+        })
+      }
       this.locationTracking ? this.startForeground() : this.stopForeground()
     },
     stopNavigation () {
@@ -112,10 +122,12 @@ export const useLocationStore = defineStore('location', {
       if (this.navigateTo.length === 2) {
         this.navigateTo[0] = this.goTo.getGeometry().getCoordinates()
       }
-      window.BackgroundGeolocation.configure({
-        notificationTitle: 'Navigation',
-        notificationText: 'Navigation to a location is in progress'
-      })
+      if (this.isCordova) {
+        window.BackgroundGeolocation.configure({
+          notificationTitle: 'Navigation',
+          notificationText: 'Navigation to a location is in progress'
+        })
+      }
       this.navigationActive = true
       this.startForeground()
     },
@@ -128,7 +140,7 @@ export const useLocationStore = defineStore('location', {
       }
     },
     stopForeground () {
-      if (this.foregroundLocationActivated && this.getIsLocationNeeded) {
+      if (this.foregroundLocationActivated && this.foregroundNotNeeded) {
         if (this.isCordova) {
           window.BackgroundGeolocation.stop()
         }

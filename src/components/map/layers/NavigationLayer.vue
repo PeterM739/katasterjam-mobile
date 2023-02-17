@@ -15,7 +15,7 @@
 import { fromLonLat } from 'ol/proj'
 import { ref } from 'vue'
 import { useLocationStore } from 'stores/location-store'
-// add top template where user can see distance, direction and can cancelcoo
+// add top template where user can see distance, direction and can cancel
 export default {
   setup () {
     const store = useLocationStore()
