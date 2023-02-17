@@ -111,7 +111,8 @@ export default {
         query: {
           lat: this.selectedCave.lat,
           lng: this.selectedCave.lng,
-          navigate: true
+          navigate: true,
+          name: `${this.selectedCave.caveNumber} - ${this.selectedCave.name}`
         }
       })
     },

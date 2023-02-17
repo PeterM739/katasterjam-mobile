@@ -28,9 +28,6 @@
     <q-page-sticky position="bottom-right" :offset="[18, 18]">
       <q-btn fab :icon="trackLocationIcon ? 'stop_circle' : 'play_arrow'" color="accent" @click="trackingClicked" />
     </q-page-sticky>
-    <q-page-sticky position="bottom-right" :offset="[18, 90]" v-if="navigationActive">
-      <q-btn fab icon="stop_circle" color="red" @click="stopNavigation"/>
-    </q-page-sticky>
   </PageFullScreen>
 </template>
 
@@ -118,9 +115,6 @@ export default defineComponent({
       } else if (this.fixedCenter) {
         this.center = center
       }
-    },
-    stopNavigation () {
-      this.store.stopNavigation()
     }
   },
   watch: {
