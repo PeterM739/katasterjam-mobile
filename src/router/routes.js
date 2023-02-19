@@ -1,3 +1,11 @@
+import { api } from 'src/boot/axios'
+
+const caveResolver = async (to, from, next) => {
+  const response = await api.get(`/api/caves/${to.params.caveNumber}`)
+  to.meta.cave = response.data
+  next()
+}
+
 const routes = [
   {
     name: 'Login',
@@ -10,7 +18,8 @@ const routes = [
     meta: { requireLogin: true },
     children: [
       { path: '', name: 'home', component: () => import('pages/IndexPage.vue') },
-      { path: '/caves', name: 'caves', component: () => import('pages/CaveSearchPage.vue') }
+      { path: '/caves', name: 'caves', component: () => import('pages/CaveSearchPage.vue') },
+      { path: '/caves/details/:caveNumber', name: 'caves-details', component: () => import('pages/CaveDetailsPage.vue'), beforeEnter: caveResolver }
     ]
   },
 

@@ -1,0 +1,242 @@
+<template>
+  <q-card class="cave-top">
+    <ol-map loadTilesWhileAnimating loadTilesWhileInteracting style="height:200px;">
+      <ol-view
+        ref="view"
+        :enableRotation="false"
+        :center="center"
+        :zoom="zoom"
+        :projection="projection"/>
+      <CartoLayers/>
+      <ol-vector-layer>
+        <ol-source-vector :features="markLocations">
+        </ol-source-vector>
+      </ol-vector-layer>
+    </ol-map>
+
+    <q-card-section>
+      <q-fab
+        class="absolute"
+        style="top: 0; right: 12px; transform: translateY(-50%);"
+        vertical-actions-align="right"
+        color="primary"
+        glossy
+        icon="keyboard_arrow_up"
+        direction="up"
+      >
+        <q-fab-action label-position="left" color="green" icon="map" label="Main map" @click="showOnMap" />
+        <q-fab-action label-position="left" color="red" :icon="favouriteIcon" label="Favourite" @click="toggleFavourite"/>
+        <q-fab-action label-position="left" color="orange" icon="assist_walker" label="Navigate" @click="goTo" />
+      </q-fab>
+      <div class="text-overline text-orange-9">Cave details</div>
+      <div class="row no-wrap items-center">
+        <div class="col text-h6 ellipsis">
+          {{cave.caveNumber}} - {{ cave.name }}
+        </div>
+        <div class="col-auto text-grey text-caption q-pt-md row no-wrap items-center">
+          <q-icon :name="favouriteIcon" :color="cave.isFavourite ? 'red' : 'default'" size="sm"/>
+        </div>
+      </div>
+      <div class="row no-wrap items-center">
+        <div class="col-auto text-grey text-caption q-pt-md row no-wrap items-center">
+          Length: {{ cave.length }} m, Depth: {{ cave.depth }} m
+        </div>
+      </div>
+    </q-card-section>
+    <q-separator />
+    <q-markup-table>
+      <tbody>
+        <tr>
+          <td class="text-left table-row-fit">Organizations</td>
+          <td class="text-left table-row-fit">
+            <span v-bind:key="organization.id" v-for="(organization, index) in cave.organizations">
+              {{ organization.name }}<span v-if="index+1 < cave.organizations.length">, </span>
+            </span>
+          </td>
+        </tr>
+        <tr>
+          <td class="text-left table-row-fit">Date of discovery</td>
+          <td class="text-left table-row-fit">{{ formatDate(cave.dateOfExcursion) }}</td>
+        </tr>
+        <tr>
+          <td class="text-left table-row-fit">Author(s) of the report</td>
+          <td class="text-left table-row-fit">{{ cave.author }}</td>
+        </tr>
+        <tr>
+          <td class="text-left table-row-fit">Discoverer(s)</td>
+          <td class="text-left table-row-fit">{{ cave.team }}</td>
+        </tr>
+        <tr>
+          <td class="text-left table-row-fit">Import date</td>
+          <td class="text-left table-row-fit">{{ formatDate(cave.dateOfSubmission) }}</td>
+        </tr>
+        <tr>
+          <td class="text-left table-row-fit">Note</td>
+          <td class="text-left table-row-fit">{{ cave.notes }}</td>
+        </tr>
+        <tr>
+          <td class="text-left table-row-fit">Show cave</td>
+          <td class="text-left table-row-fit">{{ (cave.turisticCave ? 'Yes' : 'No')}}</td>
+        </tr>
+        <tr>
+          <td class="text-left table-row-fit">Type</td>
+          <td class="text-left table-row-fit">
+            <span v-for="({name, description}, idx) in cave.caveTypes" :key="idx">
+              {{name}} - {{description}}
+            </span>
+          </td>
+        </tr>
+        <tr>
+          <td class="text-left table-row-fit">DK-48</td>
+          <td class="text-left table-row-fit">{{ cave.xcoordinate }}, {{ cave.ycoordinate }}</td>
+        </tr>
+        <tr>
+          <td class="text-left table-row-fit">WGS-84</td>
+          <td class="text-left table-row-fit">{{ cave.lng.toFixed(5) }}, {{ cave.lat.toFixed(5) }}</td>
+        </tr>
+        <tr>
+          <td class="text-left table-row-fit">Entrance elevation [m a.s.l.]</td>
+          <td class="text-left table-row-fit">{{ cave.entranceElevation }} m</td>
+        </tr>
+        <tr>
+          <td class="text-left table-row-fit">Place</td>
+          <td class="text-left table-row-fit">{{ cave.settlement?.name }}</td>
+        </tr>
+        <tr>
+          <td class="text-left table-row-fit">Municipality</td>
+          <td class="text-left table-row-fit">{{ cave.settlement?.municipality }}</td>
+        </tr>
+        <tr>
+          <td class="text-left table-row-fit">Kadaster Municipality</td>
+          <td class="text-left table-row-fit">{{ cave.kadasterMunicipality?.name }}</td>
+        </tr>
+      </tbody>
+    </q-markup-table>
+  </q-card>
+</template>
+
+<script>
+import { useQuasar } from 'quasar'
+import { ref } from 'vue'
+import { fromLonLat } from 'ol/proj'
+import Point from 'ol/geom/Point'
+import { Feature } from 'ol'
+import CartoLayers from 'src/components/map/layers/CartoLayers.vue'
+import { api } from 'src/boot/axios'
+import { formatDate } from 'src/helpers/date'
+
+export default {
+  name: 'CaveDetailsPage',
+  components: { CartoLayers },
+  setup () {
+    const { dialog } = useQuasar()
+    const center = ref([1637531, 5766419])
+    const projection = ref('EPSG:3857')
+    const zoom = ref(15)
+    const markLocations = ref([])
+    const view = ref('')
+    const cave = ref(null)
+    const confirmRef = ref(null)
+
+    return {
+      confirmDialog: dialog,
+      center,
+      projection,
+      zoom,
+      view,
+      confirm: ref(false),
+      markLocations,
+      cave,
+      confirmRef,
+      formatDate
+    }
+  },
+  computed: {
+    favouriteIcon () {
+      return this.cave.isFavourite ? 'favorite' : 'favorite_border'
+    },
+    selectedName () {
+      return `[${this.cave?.caveNumber}] ${this.cave?.name}`
+    }
+  },
+  methods: {
+    goTo () {
+      this.confirm = true
+      const name = `[${this.cave?.caveNumber}] ${this.cave?.name}`
+      this.confirmDialog({
+        title: 'Confirm',
+        message: `Do you want to start navigation to the cave: ${name}`,
+        cancel: true,
+        persistent: true
+      }).onOk(() => {
+        this.$router.push({
+          path: '/',
+          query: {
+            lat: this.cave.lat,
+            lng: this.cave.lng,
+            navigate: true,
+            name
+          }
+        })
+      })
+    },
+    showOnMap () {
+      this.$router.push({
+        path: '/',
+        query: {
+          lat: this.cave.lat,
+          lng: this.cave.lng
+        }
+      })
+    },
+    navigateToSelectedCave () {
+      this.$router.push({
+        path: '/',
+        query: {
+          lat: this.cave.lat,
+          lng: this.cave.lng,
+          navigate: true,
+          name: `${this.cave.caveNumber} - ${this.cave.name}`
+        }
+      })
+    },
+    async toggleFavourite () {
+      if (this.cave.isFavourite) {
+        try {
+          await api.delete('/api/favorites/', {
+            data: {
+              caveId: this.cave.caveNumber
+            }
+          })
+          this.cave.isFavourite = false
+        } catch (error) {
+          console.error(error)
+        }
+      } else {
+        try {
+          await api.post('/api/favorites', {
+            caveId: this.cave.caveNumber
+          })
+          this.cave.isFavourite = true
+        } catch (error) {
+          console.error(error)
+        }
+      }
+    }
+  },
+  created () {
+    this.cave = this.$route.meta.cave
+    const coords = fromLonLat([this.cave.lng, this.cave.lat])
+    this.center = coords
+    const mark = new Feature(new Point(coords))
+    this.markLocations = [mark]
+  }
+}
+</script>
+
+<style>
+.table-row-fit {
+  word-wrap: break-word;
+  white-space: normal !important
+}
+</style>
