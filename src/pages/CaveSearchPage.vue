@@ -102,19 +102,17 @@ export default {
   methods: {
     goTo ({ reset }, cave) {
       reset()
-      console.log('go to cave (TODO): ', cave)
       this.selectedCave = cave
       this.confirm = true
     },
     navigateToSelectedCave () {
-      console.log('navigateToSelectedCave to cave (TODO): ', this.selectedCave)
-
       this.$router.push({
         path: '/',
         query: {
           lat: this.selectedCave.lat,
           lng: this.selectedCave.lng,
-          navigate: true
+          navigate: true,
+          name: `${this.selectedCave.caveNumber} - ${this.selectedCave.name}`
         }
       })
     },

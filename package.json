@@ -9,7 +9,8 @@
     "dev": "quasar dev",
     "mobile": "quasar dev -m cordova -T android",
     "mobile-update": "quasar build -m android --skip-pkg",
-    "build-mobile": "quasar build -m android"
+    "build-mobile": "quasar build -m android",
+    "build-mobile-test": "quasar build -m android --debug"
   },
   "dependencies": {
     "@quasar/extras": "^1.0.0",
