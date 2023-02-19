@@ -124,13 +124,13 @@
 
 <script>
 import { ref } from 'vue'
-import moment from 'moment'
 import { fromLonLat } from 'ol/proj'
 import Point from 'ol/geom/Point'
 import { Feature } from 'ol'
 import CartoLayers from 'src/components/map/layers/CartoLayers.vue'
 import ConfirmNavigation from 'src/components/dialogs/ConfirmNavigation.vue'
 import { api } from 'src/boot/axios'
+import { formatDate } from 'src/helpers/date'
 
 export default {
   name: 'CaveDetailsPage',
@@ -152,7 +152,8 @@ export default {
       confirm: ref(false),
       markLocations,
       cave,
-      confirmRef
+      confirmRef,
+      formatDate
     }
   },
   computed: {
@@ -210,12 +211,6 @@ export default {
           console.error(error)
         }
       }
-    },
-    formatDate (date) {
-      if (date) {
-        return moment(String(date)).format('DD. MM. YYYY')
-      }
-      return ''
     }
   },
   created () {
