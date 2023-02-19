@@ -41,26 +41,22 @@
     </div>
   </q-list>
   <q-btn unelevated color="light-blue-7" size="lg" class="full-width" label="Load more" @click="loadMore" :disabled="(totalPages <= pageNumber)"/>
-  <q-dialog v-model="confirm" persistent>
-    <q-card>
-      <q-card-section class="row items-center">
-        <q-avatar icon="assist_walker" color="primary" text-color="white" />
-        <span class="q-ml-sm">Do you want to start navigation to the cave: <b>[{{selectedCave.caveNumber}}] {{selectedCave.name}}</b>?</span>
-      </q-card-section>
-
-      <q-card-actions align="right">
-        <q-btn flat label="Cancel" color="primary" v-close-popup />
-        <q-btn flat label="Go!" color="primary" v-close-popup @click="navigateToSelectedCave"/>
-      </q-card-actions>
-    </q-card>
-  </q-dialog>
+  <ConfirmNavigation
+    ref="confirmRef"
+    :selectedName="selectedName"
+    :selectedType="'cave'"
+    :lat="selectedCave?.lat"
+    :lng="selectedCave?.lng"
+  />
 </template>
 
 <script>
 import { ref } from 'vue'
 import { useCavesStore } from 'stores/cave-store'
+import ConfirmNavigation from 'src/components/dialogs/ConfirmNavigation.vue'
 export default {
   name: 'CaveSearchPage',
+  components: { ConfirmNavigation },
   setup () {
     const store = useCavesStore()
 
@@ -71,13 +67,15 @@ export default {
     }
     const query = ref(store.getQuery)
     const selectedCave = ref(null)
+    const confirmRef = ref(null)
 
     return {
       store,
       query,
       confirm: ref(false),
       selectedCave,
-      closeSlider: null
+      closeSlider: null,
+      confirmRef
     }
   },
   computed: {
@@ -92,6 +90,9 @@ export default {
     },
     currentSort () {
       return this.store.getCurrentSort
+    },
+    selectedName () {
+      return `[${this.selectedCave?.caveNumber}] ${this.selectedCave?.name}`
     }
   },
   watch: {
@@ -103,21 +104,13 @@ export default {
     goTo ({ reset }, cave) {
       reset()
       this.selectedCave = cave
-      this.confirm = true
-    },
-    navigateToSelectedCave () {
-      this.$router.push({
-        path: '/',
-        query: {
-          lat: this.selectedCave.lat,
-          lng: this.selectedCave.lng,
-          navigate: true,
-          name: `${this.selectedCave.caveNumber} - ${this.selectedCave.name}`
-        }
-      })
+      this.confirmRef.show()
     },
     caveClick (caveNumber) {
-      console.log('show cave details (TODO): ', caveNumber)
+      this.$router.push({
+        name: 'caves-details',
+        params: { caveNumber }
+      })
     },
     showOnMapClick (cave) {
       this.$router.push({
@@ -176,6 +169,10 @@ export default {
             sort: 'distance',
             sortDirection: 'asc',
             pageNumber: 1
+          }, (code, message) => {
+            console.error('Error when trying to fetch location', code, message)
+          }, {
+            enableHighAccuracy: true
           })
 
           await this.store.searchForCaves()
