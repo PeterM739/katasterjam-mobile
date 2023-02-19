@@ -41,23 +41,17 @@
     </div>
   </q-list>
   <q-btn unelevated color="light-blue-7" size="lg" class="full-width" label="Load more" @click="loadMore" :disabled="(totalPages <= pageNumber)"/>
-  <ConfirmNavigation
-    ref="confirmRef"
-    :selectedName="selectedName"
-    :selectedType="'cave'"
-    :lat="selectedCave?.lat"
-    :lng="selectedCave?.lng"
-  />
 </template>
 
 <script>
+
+import { useQuasar } from 'quasar'
 import { ref } from 'vue'
 import { useCavesStore } from 'stores/cave-store'
-import ConfirmNavigation from 'src/components/dialogs/ConfirmNavigation.vue'
 export default {
   name: 'CaveSearchPage',
-  components: { ConfirmNavigation },
   setup () {
+    const { dialog } = useQuasar()
     const store = useCavesStore()
 
     if (store.getCaves.length === 0) {
@@ -70,6 +64,7 @@ export default {
     const confirmRef = ref(null)
 
     return {
+      confirmDialog: dialog,
       store,
       query,
       confirm: ref(false),
@@ -104,7 +99,23 @@ export default {
     goTo ({ reset }, cave) {
       reset()
       this.selectedCave = cave
-      this.confirmRef.show()
+      const name = `[${this.selectedCave?.caveNumber}] ${this.selectedCave?.name}`
+      this.confirmDialog({
+        title: 'Confirm',
+        message: `Do you want to start navigation to the cave: ${name}`,
+        cancel: true,
+        persistent: true
+      }).onOk(() => {
+        this.$router.push({
+          path: '/',
+          query: {
+            lat: this.selectedCave.lat,
+            lng: this.selectedCave.lng,
+            navigate: true,
+            name
+          }
+        })
+      })
     },
     caveClick (caveNumber) {
       this.$router.push({

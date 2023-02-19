@@ -113,29 +113,23 @@
       </tbody>
     </q-markup-table>
   </q-card>
-  <ConfirmNavigation
-    ref="confirmRef"
-    :selectedName="selectedName"
-    :selectedType="'cave'"
-    :lat="cave?.lat"
-    :lng="cave?.lng"
-  />
 </template>
 
 <script>
+import { useQuasar } from 'quasar'
 import { ref } from 'vue'
 import { fromLonLat } from 'ol/proj'
 import Point from 'ol/geom/Point'
 import { Feature } from 'ol'
 import CartoLayers from 'src/components/map/layers/CartoLayers.vue'
-import ConfirmNavigation from 'src/components/dialogs/ConfirmNavigation.vue'
 import { api } from 'src/boot/axios'
 import { formatDate } from 'src/helpers/date'
 
 export default {
   name: 'CaveDetailsPage',
-  components: { CartoLayers, ConfirmNavigation },
+  components: { CartoLayers },
   setup () {
+    const { dialog } = useQuasar()
     const center = ref([1637531, 5766419])
     const projection = ref('EPSG:3857')
     const zoom = ref(15)
@@ -145,6 +139,7 @@ export default {
     const confirmRef = ref(null)
 
     return {
+      confirmDialog: dialog,
       center,
       projection,
       zoom,
@@ -167,7 +162,23 @@ export default {
   methods: {
     goTo () {
       this.confirm = true
-      this.confirmRef.show()
+      const name = `[${this.cave?.caveNumber}] ${this.cave?.name}`
+      this.confirmDialog({
+        title: 'Confirm',
+        message: `Do you want to start navigation to the cave: ${name}`,
+        cancel: true,
+        persistent: true
+      }).onOk(() => {
+        this.$router.push({
+          path: '/',
+          query: {
+            lat: this.cave.lat,
+            lng: this.cave.lng,
+            navigate: true,
+            name
+          }
+        })
+      })
     },
     showOnMap () {
       this.$router.push({
