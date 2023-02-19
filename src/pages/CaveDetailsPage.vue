@@ -56,7 +56,7 @@
         </tr>
         <tr>
           <td class="text-left table-row-fit">Date of discovery</td>
-          <td class="text-left table-row-fit">{{ cave.dateOfExcursion }}</td>
+          <td class="text-left table-row-fit">{{ formatDate(cave.dateOfExcursion) }}</td>
         </tr>
         <tr>
           <td class="text-left table-row-fit">Author(s) of the report</td>
@@ -68,7 +68,7 @@
         </tr>
         <tr>
           <td class="text-left table-row-fit">Import date</td>
-          <td class="text-left table-row-fit">{{ cave.dateOfSubmission ?? '/' }}</td>
+          <td class="text-left table-row-fit">{{ formatDate(cave.dateOfSubmission) }}</td>
         </tr>
         <tr>
           <td class="text-left table-row-fit">Note</td>
@@ -124,6 +124,7 @@
 
 <script>
 import { ref } from 'vue'
+import moment from 'moment'
 import { fromLonLat } from 'ol/proj'
 import Point from 'ol/geom/Point'
 import { Feature } from 'ol'
@@ -209,6 +210,12 @@ export default {
           console.error(error)
         }
       }
+    },
+    formatDate (date) {
+      if (date) {
+        return moment(String(date)).format('DD. MM. YYYY')
+      }
+      return ''
     }
   },
   created () {
