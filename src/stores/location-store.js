@@ -1,9 +1,9 @@
 import { defineStore } from 'pinia'
 import { Platform } from 'quasar'
+import { fromLonLat } from 'ol/proj'
 
 export const useLocationStore = defineStore('location', {
   state: () => ({
-    locationUpdates: [],
     foregroundLocationActivated: false,
     isCordova: Platform.is.cordova,
     projection: null,
@@ -11,8 +11,7 @@ export const useLocationStore = defineStore('location', {
     watchId: null,
     locationTracking: false,
     navigationActive: false,
-    myLocation: [],
-    myLocationCoordinates: [],
+    myLocation: {},
     myTrack: [],
     navigateTo: []
   }),
@@ -33,8 +32,11 @@ export const useLocationStore = defineStore('location', {
     getMyLocation (state) {
       return state.myLocation
     },
+    getMyLocationAccuracy (state) {
+      return state.myLocation.accuracy
+    },
     getMyLocationCoordinates (state) {
-      return state.myLocationCoordinates
+      return state.myLocation.coordinates
     },
     getMyTrack (state) {
       return state.myTrack
@@ -49,6 +51,9 @@ export const useLocationStore = defineStore('location', {
   actions: {
     initialize (projection) {
       this.projection = projection
+      if (this.watchId) {
+        navigator.compass.clearWatch(this.watchId)
+      }
       if (this.isCordova) {
         window.BackgroundGeolocation.configure({
           locationProvider: window.BackgroundGeolocation.DISTANCE_FILTER_PROVIDER,
@@ -80,7 +85,7 @@ export const useLocationStore = defineStore('location', {
         })
 
         window.BackgroundGeolocation.on('location', (location) => {
-          this.locationUpdates.map(update => update.locationUpdated(location, this.projection))
+          this.newLocationUpdate(location)
         })
 
         this.watchId = navigator.compass.watchHeading((heading) => {
@@ -95,17 +100,31 @@ export const useLocationStore = defineStore('location', {
         if (this.foregroundLocationActivated && position.coords.accuracy > 10 && this.isCordova) {
           return
         }
-
-        this.locationUpdates.map(update => update.locationUpdated(position.coords, this.projection))
+        this.newLocationUpdate(position.coords)
       }, (code, message) => {
         console.error('Error when trying to fetch location', code, message)
       }, {
         enableHighAccuracy: true
       })
     },
+    newLocationUpdate (location) {
+      const coords = fromLonLat([location.longitude, location.latitude])
+      this.myLocation = {
+        coordinates: coords,
+        accuracy: location.accuracy,
+        latitude: location.latitude,
+        longitude: location.longitude
+      }
+      if (this.getLocationTracking) {
+        this.updateMyTrack(coords)
+      }
+      if (this.getNavigationActive) {
+        this.updateNavigation(coords)
+      }
+    },
     toggleLocationTracking () {
       this.locationTracking = !this.locationTracking
-      if (this.isCordova) {
+      if (this.locationTracking && this.isCordova) {
         window.BackgroundGeolocation.configure({
           notificationTitle: 'Location tracking',
           notificationText: 'Tracking your location is in progress'
@@ -116,6 +135,7 @@ export const useLocationStore = defineStore('location', {
     stopNavigation () {
       this.navigationActive = false
       this.stopForeground()
+      this.updateNavigation([])
     },
     startNavigation (goTo) {
       this.goTo = goTo
@@ -146,14 +166,6 @@ export const useLocationStore = defineStore('location', {
         }
         this.foregroundLocationActivated = false
       }
-      this.locationUpdates.map(update => update.locationStopped())
-    },
-    registerForLocationUpdates (locationUpdate) {
-      this.locationUpdates.push(locationUpdate)
-    },
-    updateMyLocation (coords, myLocation) {
-      this.myLocation = myLocation
-      this.myLocationCoordinates = coords
     },
     updateMyTrack (coords) {
       this.myTrack.push(coords)

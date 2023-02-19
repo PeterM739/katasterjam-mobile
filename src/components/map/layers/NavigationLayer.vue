@@ -26,7 +26,6 @@
 </template>
 
 <script>
-import { fromLonLat } from 'ol/proj'
 import { ref } from 'vue'
 import { useLocationStore } from 'stores/location-store'
 import LineString from 'ol/geom/LineString'
@@ -39,20 +38,6 @@ export default {
     const store = useLocationStore()
     const strokeWidth = ref(3)
     const strokeColor = ref('green')
-    store.registerForLocationUpdates({
-      locationUpdated: (location) => {
-        const coords = fromLonLat([location.longitude, location.latitude])
-        if (store.getNavigationActive) {
-          store.updateNavigation(coords)
-        }
-      },
-      locationStopped: () => {
-        console.log('location terminated')
-        if (!store.getNavigationActive) {
-          store.updateNavigation([])
-        }
-      }
-    })
 
     return {
       dialog,

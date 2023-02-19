@@ -12,7 +12,6 @@
 </template>
 
 <script>
-import { fromLonLat } from 'ol/proj'
 import { ref } from 'vue'
 import { useLocationStore } from 'stores/location-store'
 
@@ -21,17 +20,6 @@ export default {
     const store = useLocationStore()
     const strokeWidth = ref(5)
     const strokeColor = ref('red')
-    store.registerForLocationUpdates({
-      locationUpdated: (location) => {
-        const coords = fromLonLat([location.longitude, location.latitude])
-        if (store.getLocationTracking) {
-          store.updateMyTrack(coords)
-        }
-      },
-      locationStopped: () => {
-        console.log('location terminated. TODO: handle track (delete or save)')
-      }
-    })
 
     return {
       store,

@@ -1,9 +1,9 @@
 <template>
   <ol-vector-layer>
-    <ol-source-vector :features="myLocation">
+    <ol-source-vector :features="myLocationFeatures">
     </ol-source-vector>
   </ol-vector-layer>
-  <ol-overlay :position="myLocationCoordinates" :positioning="'center-center'" v-if="myLocation.length > 0">
+  <ol-overlay :position="myLocationCoordinates" :positioning="'center-center'" v-if="myLocationFeatures.length > 0">
     <template v-slot="slotProps">
       <q-icon name="navigation" :class="slotProps" :style="{ rotate: rotation + 'deg' }" size="lg" />
     </template>
@@ -12,7 +12,8 @@
   <NavigationLayer />
 </template>
 <script>
-import { fromLonLat } from 'ol/proj'
+import { ref } from 'vue'
+import { storeToRefs } from 'pinia'
 import Point from 'ol/geom/Point'
 import { Feature } from 'ol'
 import { circular } from 'ol/geom/Polygon'
@@ -25,34 +26,31 @@ export default {
   components: { TrackingLayer, NavigationLayer },
   setup () {
     const store = useLocationStore()
-    store.registerForLocationUpdates({
-      locationUpdated: (location, projection) => {
-        const coords = fromLonLat([location.longitude, location.latitude])
-        const accuracy = circular([location.longitude, location.latitude], location.accuracy)
-        store.updateMyLocation(coords, [
-          new Feature(accuracy.transform('EPSG:4326', projection)),
-          new Feature(new Point(coords))
-        ])
-      },
-      locationStopped: () => {
-        console.log('location terminated')
-      }
-    })
+    const myLocationCoordinates = ref([])
+    const myLocationFeatures = ref([])
+    const { myLocation } = storeToRefs(store)
 
     return {
-      store
+      store,
+      myLocationCoordinates,
+      myLocationFeatures,
+      myLocation
     }
   },
   computed: {
     rotation () {
       return this.store.getRotation
-    },
-    myLocation () {
-      return this.store.getMyLocation
-    },
-    myLocationCoordinates () {
+    }
+  },
+  watch: {
+    myLocation (newValue, oldValue) {
+      const accuracy = circular([newValue.longitude, newValue.latitude], this.store.getMyLocationAccuracy)
+      this.myLocationFeatures = [
+        new Feature(accuracy.transform('EPSG:4326', this.store.getProjection)),
+        new Feature(new Point(this.store.getMyLocationCoordinates))
+      ]
+      this.myLocationCoordinates = newValue.coordinates
       this.$emit('centerChanged', this.store.getMyLocationCoordinates)
-      return this.store.getMyLocationCoordinates
     }
   }
 }
