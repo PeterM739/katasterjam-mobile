@@ -3,8 +3,8 @@
       <q-card style="width: 350px">
         <q-card-section class="row items-center no-wrap">
           <div>
-            <div class="text-weight-bold">Go to: {{ name }}</div>
-            <div class="text-grey">Distance: {{ distance }} {{ distanceUnit }}</div>
+            <div class="text-weight-bold">{{ $t('goTo') }}: {{ name }}</div>
+            <div class="text-grey">{{ $t('distance') }}: {{ distance }} {{ distanceUnit }}</div>
           </div>
 
           <q-space />

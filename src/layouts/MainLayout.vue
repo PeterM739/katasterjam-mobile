@@ -13,7 +13,7 @@
     <q-drawer v-model="leftDrawerOpen" show-if-above bordered>
       <q-list>
         <q-item-label header>
-          Navigation
+          {{ $t('menu') }}
         </q-item-label>
 
         <q-item clickable :to="{ name: 'home' }" exact>
@@ -21,7 +21,7 @@
             <q-icon name="home" />
           </q-item-section>
           <q-item-section>
-            <q-item-label>Home</q-item-label>
+            <q-item-label>{{ $t('home') }}</q-item-label>
           </q-item-section>
         </q-item>
 
@@ -30,14 +30,14 @@
             <q-icon name="egg_alt" />
           </q-item-section>
           <q-item-section>
-            <q-item-label>Caves</q-item-label>
+            <q-item-label>{{ $t('caves') }}</q-item-label>
           </q-item-section>
         </q-item>
         <q-item clickable v-ripple @click.once="logOutButton">
           <q-item-section avatar>
             <q-icon name="logout" />
           </q-item-section>
-          <q-item-section>Log out</q-item-section>
+          <q-item-section>{{ $t('logOut') }}</q-item-section>
         </q-item>
       </q-list>
     </q-drawer>
