@@ -82,7 +82,7 @@
           <td class="text-left table-row-fit">{{$t('type')}}</td>
           <td class="text-left table-row-fit">
             <span v-for="({name, description}, idx) in cave.caveTypes" :key="idx">
-              {{name}} - {{$t(description)}}
+              {{name}} - {{$t(`caveTypes.${description}`)}}
             </span>
           </td>
         </tr>
