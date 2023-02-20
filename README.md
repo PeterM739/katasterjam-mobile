@@ -1,4 +1,4 @@
-# Kataster jam (app.katastrjam.si)
+# Kataster jam
 
 Aplikacija za terensko delo popisa jam
 
