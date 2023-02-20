@@ -24,11 +24,11 @@
         icon="keyboard_arrow_up"
         direction="up"
       >
-        <q-fab-action label-position="left" color="green" icon="map" label="Main map" @click="showOnMap" />
-        <q-fab-action label-position="left" color="red" :icon="favouriteIcon" label="Favourite" @click="toggleFavourite"/>
-        <q-fab-action label-position="left" color="orange" icon="assist_walker" label="Navigate" @click="goTo" />
+        <q-fab-action label-position="left" color="green" icon="map" :label="$t('mainMap')" @click="showOnMap" />
+        <q-fab-action label-position="left" color="red" :icon="favouriteIcon" :label="$t('favourite')" @click="toggleFavourite"/>
+        <q-fab-action label-position="left" color="orange" icon="assist_walker" :label="$t('navigate')" @click="goTo" />
       </q-fab>
-      <div class="text-overline text-orange-9">Cave details</div>
+      <div class="text-overline text-orange-9">{{$t('caveDetails')}}</div>
       <div class="row no-wrap items-center">
         <div class="col text-h6 ellipsis">
           {{cave.caveNumber}} - {{ cave.name }}
@@ -39,7 +39,7 @@
       </div>
       <div class="row no-wrap items-center">
         <div class="col-auto text-grey text-caption q-pt-md row no-wrap items-center">
-          Length: {{ cave.length }} m, Depth: {{ cave.depth }} m
+          {{$t('length')}}: {{ cave.length }} m, {{$t('depth')}}: {{ cave.depth }} m
         </div>
       </div>
     </q-card-section>
@@ -47,7 +47,7 @@
     <q-markup-table>
       <tbody>
         <tr>
-          <td class="text-left table-row-fit">Organizations</td>
+          <td class="text-left table-row-fit">{{$t('organizations')}}</td>
           <td class="text-left table-row-fit">
             <span v-bind:key="organization.id" v-for="(organization, index) in cave.organizations">
               {{ organization.name }}<span v-if="index+1 < cave.organizations.length">, </span>
@@ -55,59 +55,59 @@
           </td>
         </tr>
         <tr>
-          <td class="text-left table-row-fit">Date of discovery</td>
+          <td class="text-left table-row-fit">{{$t('dateOfDiscovery')}}</td>
           <td class="text-left table-row-fit">{{ formatDate(cave.dateOfExcursion) }}</td>
         </tr>
         <tr>
-          <td class="text-left table-row-fit">Author(s) of the report</td>
+          <td class="text-left table-row-fit">{{$t('authorsOfReport')}}</td>
           <td class="text-left table-row-fit">{{ cave.author }}</td>
         </tr>
         <tr>
-          <td class="text-left table-row-fit">Discoverer(s)</td>
+          <td class="text-left table-row-fit">{{$t('discoverers')}}</td>
           <td class="text-left table-row-fit">{{ cave.team }}</td>
         </tr>
         <tr>
-          <td class="text-left table-row-fit">Import date</td>
+          <td class="text-left table-row-fit">{{$t('importDate')}}</td>
           <td class="text-left table-row-fit">{{ formatDate(cave.dateOfSubmission) }}</td>
         </tr>
         <tr>
-          <td class="text-left table-row-fit">Note</td>
+          <td class="text-left table-row-fit">{{$t('note')}}</td>
           <td class="text-left table-row-fit">{{ cave.notes }}</td>
         </tr>
         <tr>
-          <td class="text-left table-row-fit">Show cave</td>
+          <td class="text-left table-row-fit">{{$t('showCave')}}</td>
           <td class="text-left table-row-fit">{{ (cave.turisticCave ? 'Yes' : 'No')}}</td>
         </tr>
         <tr>
-          <td class="text-left table-row-fit">Type</td>
+          <td class="text-left table-row-fit">{{$t('type')}}</td>
           <td class="text-left table-row-fit">
             <span v-for="({name, description}, idx) in cave.caveTypes" :key="idx">
-              {{name}} - {{description}}
+              {{name}} - {{$t(description)}}
             </span>
           </td>
         </tr>
         <tr>
-          <td class="text-left table-row-fit">DK-48</td>
+          <td class="text-left table-row-fit">{{$t('dk48')}}</td>
           <td class="text-left table-row-fit">{{ cave.xcoordinate }}, {{ cave.ycoordinate }}</td>
         </tr>
         <tr>
-          <td class="text-left table-row-fit">WGS-84</td>
+          <td class="text-left table-row-fit">{{$t('wgs84')}}</td>
           <td class="text-left table-row-fit">{{ cave.lng.toFixed(5) }}, {{ cave.lat.toFixed(5) }}</td>
         </tr>
         <tr>
-          <td class="text-left table-row-fit">Entrance elevation [m a.s.l.]</td>
+          <td class="text-left table-row-fit">{{$t('entranceElevation')}}</td>
           <td class="text-left table-row-fit">{{ cave.entranceElevation }} m</td>
         </tr>
         <tr>
-          <td class="text-left table-row-fit">Place</td>
+          <td class="text-left table-row-fit">{{$t('closestTown')}}</td>
           <td class="text-left table-row-fit">{{ cave.settlement?.name }}</td>
         </tr>
         <tr>
-          <td class="text-left table-row-fit">Municipality</td>
+          <td class="text-left table-row-fit">{{$t('municipality')}}</td>
           <td class="text-left table-row-fit">{{ cave.settlement?.municipality }}</td>
         </tr>
         <tr>
-          <td class="text-left table-row-fit">Kadaster Municipality</td>
+          <td class="text-left table-row-fit">{{$t('kadasterMunicipality')}}</td>
           <td class="text-left table-row-fit">{{ cave.kadasterMunicipality?.name }}</td>
         </tr>
       </tbody>
@@ -164,8 +164,8 @@ export default {
       this.confirm = true
       const name = `[${this.cave?.caveNumber}] ${this.cave?.name}`
       this.confirmDialog({
-        title: 'Confirm',
-        message: `Do you want to start navigation to the cave: ${name}`,
+        title: `${this.$t('confirm')}`,
+        message: `${this.$t('navigateToCave')}: ${name}`,
         cancel: true,
         persistent: true
       }).onOk(() => {

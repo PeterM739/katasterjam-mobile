@@ -3,8 +3,8 @@
     v-model="query"
     debounce="500"
     filled
-    placeholder="Search"
-    hint="Search for cave by name or number"
+    :placeholder="$t('search')"
+    :hint="$t('searchForCave')"
   >
     <template v-slot:append>
       <q-icon name="search" />
@@ -27,9 +27,9 @@
 
           <q-item-section>
             <q-item-label lines="1">{{ cave.caveNumber }} - {{ cave.name }}</q-item-label>
-            <q-item-label caption>Length: {{ cave.length }} m, depth: {{ cave.depth }} m</q-item-label>
+            <q-item-label caption>{{$t('length')}}: {{ cave.length }} m, {{$t('depth')}}: {{ cave.depth }} m</q-item-label>
             <q-item-label caption>{{ cave.organization }}</q-item-label>
-            <q-item-label v-if="cave.distance" caption>Distance: {{ parseInt(cave.distance) }} m</q-item-label>
+            <q-item-label v-if="cave.distance" caption>{{$t('distance')}}: {{ parseInt(cave.distance) }} m</q-item-label>
           </q-item-section>
 
           <q-item-section side>
@@ -40,7 +40,7 @@
       <q-separator/>
     </div>
   </q-list>
-  <q-btn unelevated color="light-blue-7" size="lg" class="full-width" label="Load more" @click="loadMore" :disabled="(totalPages <= pageNumber)"/>
+  <q-btn unelevated color="light-blue-7" size="lg" class="full-width" :label="$t('loadMore')" @click="loadMore" :disabled="(totalPages <= pageNumber)"/>
 </template>
 
 <script>
@@ -101,8 +101,8 @@ export default {
       this.selectedCave = cave
       const name = `[${this.selectedCave?.caveNumber}] ${this.selectedCave?.name}`
       this.confirmDialog({
-        title: 'Confirm',
-        message: `Do you want to start navigation to the cave: ${name}`,
+        title: `${this.$t('confirm')}`,
+        message: `${this.$t('navigateToCave')}: ${name}`,
         cancel: true,
         persistent: true
       }).onOk(() => {
