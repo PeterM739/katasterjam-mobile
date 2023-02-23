@@ -77,5 +77,11 @@ export default {
   home: 'Home',
   caves: 'Caves',
   logOut: 'Log out',
-  trips: 'Trips'
+  trips: 'Excursions',
+  excursionParticipants: 'Participants',
+  date: 'Date',
+  joinExcursion: 'Join excursion',
+  searchForExcursion: 'Search for excursion by name',
+  joinExcursionText: 'Are you sure you want to join excursion: ',
+  requested: 'Requested'
 }

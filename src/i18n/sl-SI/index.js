@@ -77,5 +77,11 @@ export default {
   home: 'Domov',
   caves: 'Jame',
   logOut: 'Odjava',
-  trips: 'Ekskurzije'
+  trips: 'Ekskurzije',
+  excursionParticipants: 'Udeleženci',
+  date: 'Datum',
+  joinExcursion: 'Pridruži se',
+  searchForExcursion: 'Išči ekskurzije po imenu',
+  joinExcursionText: 'Ste prepričani, da se želite pridružit: ',
+  requested: 'Zahtevano'
 }
