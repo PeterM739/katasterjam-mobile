@@ -1,4 +1,5 @@
 import { defineStore } from 'pinia'
+import { Platform } from 'quasar'
 import { api } from 'src/boot/axios'
 
 export const useCavesStore = defineStore('caves', {
@@ -12,7 +13,8 @@ export const useCavesStore = defineStore('caves', {
       sort: null,
       sortDirection: null
     },
-    totalPages: 0
+    totalPages: 0,
+    searching: false
   }),
 
   getters: {
@@ -33,6 +35,9 @@ export const useCavesStore = defineStore('caves', {
     },
     getCurrentSort (state) {
       return state.searchParameters.sort
+    },
+    getSearchingStatus (state) {
+      return state.searching
     }
   },
 
@@ -53,14 +58,64 @@ export const useCavesStore = defineStore('caves', {
       this.searchParameters.pageNumber++
     },
     async searchForCaves () {
-      const response = await api.get('/api/caves', {
-        params: this.searchParameters
-      })
-      this.totalPages = JSON.parse(response.headers.pagination).totalPages
-      if (this.searchParameters.pageNumber > 1) {
-        response.data.map(cave => this.caves.push(cave))
+      this.searching = true
+      try {
+        const response = await api.get('/api/caves', {
+          params: this.searchParameters
+        })
+        this.totalPages = JSON.parse(response.headers.pagination).totalPages
+        if (this.searchParameters.pageNumber > 1) {
+          response.data.map(cave => this.caves.push(cave))
+        } else {
+          this.caves = response.data
+        }
+      } catch (error) {
+        console.error(error)
+      } finally {
+        this.searching = false
+      }
+    },
+    async searchForNearbyCaves () {
+      if (Platform.is.cordova) {
+        window.BackgroundGeolocation.getCurrentLocation(async (location) => {
+          this.query = ''
+          this.setLocationParameters({
+            ...this.getSearchParameters,
+            query: this.query,
+            y: location.latitude,
+            x: location.longitude,
+            sort: 'distance',
+            sortDirection: 'asc',
+            pageNumber: 1
+          })
+
+          await this.searchForCaves()
+        }, (code, message) => {
+          console.error('Error when trying to fetch location', code, message)
+        }, {
+          enableHighAccuracy: true
+        })
       } else {
-        this.caves = response.data
+        navigator.geolocation.getCurrentPosition(async (position) => {
+          this.query = ''
+          this.setLocationParameters({
+            ...this.getSearchParameters,
+            query: this.query,
+            y: position.coords.latitude,
+            x: position.coords.longitude,
+            sort: 'distance',
+            sortDirection: 'asc',
+            pageNumber: 1
+          }, (code, message) => {
+            console.error('Error when trying to fetch location', code, message)
+          }, {
+            enableHighAccuracy: true
+          })
+
+          await this.searchForCaves()
+        }, (error) => {
+          console.log(error)
+        })
       }
     }
   }
