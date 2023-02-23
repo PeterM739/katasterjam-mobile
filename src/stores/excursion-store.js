@@ -22,7 +22,7 @@ export const useExcursionsStore = defineStore('excursions', {
       return state.totalPages
     },
     getQuery (state) {
-      return state.searchParameters.query
+      return state.searchParameters.name
     },
     getPageNumber (state) {
       return state.searchParameters.pageNumber
