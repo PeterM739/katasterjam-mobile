@@ -108,11 +108,10 @@ export default {
       return !excursion.meParticipant && !excursion.requestedJoin
     },
     excursionClick (id) {
-      // TODO
-      // this.$router.push({
-      //   name: 'excursions-details',
-      //   params: { id }
-      // })
+      this.$router.push({
+        name: 'trips-details',
+        params: { id }
+      })
     },
     joinExcursion ({ reset }, excursion) {
       reset()
