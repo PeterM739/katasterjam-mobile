@@ -14,7 +14,8 @@ export const useCavesStore = defineStore('caves', {
       sortDirection: null
     },
     totalPages: 0,
-    searching: false
+    searching: false,
+    searchAbort: new AbortController()
   }),
 
   getters: {
@@ -58,10 +59,15 @@ export const useCavesStore = defineStore('caves', {
       this.searchParameters.pageNumber++
     },
     async searchForCaves () {
+      if (this.searching) {
+        this.searchAbort.abort()
+      }
       this.searching = true
+      this.searchAbort = new AbortController()
       try {
         const response = await api.get('/api/caves', {
-          params: this.searchParameters
+          params: this.searchParameters,
+          signal: this.searchAbort.signal
         })
         this.totalPages = JSON.parse(response.headers.pagination).totalPages
         if (this.searchParameters.pageNumber > 1) {

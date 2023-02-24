@@ -12,7 +12,8 @@ export const useExcursionsStore = defineStore('excursions', {
       my: false
     },
     totalPages: 0,
-    searching: false
+    searching: false,
+    searchAbort: new AbortController()
   }),
   getters: {
     getExcursions (state) {
@@ -47,10 +48,15 @@ export const useExcursionsStore = defineStore('excursions', {
       this.searchParameters.pageNumber++
     },
     async searchForExcursions () {
+      if (this.searching) {
+        this.searchAbort.abort()
+      }
       this.searching = true
+      this.searchAbort = new AbortController()
       try {
         const response = await api.get('/api/excursions', {
-          params: this.searchParameters
+          params: this.searchParameters,
+          signal: this.searchAbort.signal
         })
         this.totalPages = JSON.parse(response.headers.pagination).totalPages
         if (this.searchParameters.pageNumber > 1) {
