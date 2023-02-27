@@ -33,6 +33,15 @@
             <q-item-label>{{ $t('caves') }}</q-item-label>
           </q-item-section>
         </q-item>
+
+        <q-item clickable :to="{ name: 'trips' }">
+          <q-item-section avatar>
+            <q-icon name="hiking" />
+          </q-item-section>
+          <q-item-section>
+            <q-item-label>{{ $t('trips') }}</q-item-label>
+          </q-item-section>
+        </q-item>
         <q-item clickable v-ripple @click.once="logOutButton">
           <q-item-section avatar>
             <q-icon name="logout" />
