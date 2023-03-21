@@ -21,6 +21,26 @@
         </ol-source-vector>
       </ol-vector-layer>
     </ol-map>
+    <q-page-sticky position="top-right" :offset="[18, 18]">
+      <q-fab
+      size="100px"
+        external-label
+        color="purple"
+        icon="layers"
+        direction="left"
+      >
+        <q-fab-action padding="3px" margin="10px" label-class="bg-grey-3 text-grey-8" external-label label-position="bottom"
+          :color="mapStore.isSkyViewActive ? 'red' : 'primary'"
+          @click="mapStore.toggleSkyView"
+          icon="img:map/skyview.png"
+          label="Skyview" />
+        <q-fab-action padding="3px" label-class="bg-grey-3 text-grey-8" external-label label-position="bottom"
+          :color="mapStore.isOrthoPhotoActive ? 'red' : 'primary'"
+          @click="mapStore.toggleOrthoPhoto"
+          icon="img:map/ortophoto.png"
+          label="Ortho" />
+      </q-fab>
+    </q-page-sticky>
 
     <q-page-sticky position="bottom-left" :offset="[18, 18]">
       <q-btn fab :icon="isCenterFixed ? 'my_location' : 'location_searching'" color="accent" @click="myLocationClicked" />
@@ -40,11 +60,13 @@ import PageFullScreen from 'layouts/PageFullScreen.vue'
 import CartoLayers from 'src/components/map/layers/CartoLayers.vue'
 import LocationLayers from 'src/components/map/layers/LocationLayers.vue'
 import { useLocationStore } from 'stores/location-store'
+import { useMapStore } from 'stores/map-store'
 export default defineComponent({
   name: 'IndexPage',
   components: { PageFullScreen, CartoLayers, LocationLayers },
   setup () {
     const store = useLocationStore()
+    const mapStore = useMapStore()
     const center = ref([1637531, 5766419])
     const projection = ref('EPSG:3857')
     const zoom = ref(8)
@@ -59,7 +81,8 @@ export default defineComponent({
       zoom,
       view,
       markLocations,
-      goTo
+      goTo,
+      mapStore
     }
   },
   data () {
