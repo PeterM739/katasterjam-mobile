@@ -83,5 +83,27 @@ export default {
   joinExcursion: 'Pridruži se',
   searchForExcursion: 'Išči ekskurzije po imenu',
   joinExcursionText: 'Ste prepričani, da se želite pridružit: ',
-  requested: 'Zahtevano'
+  requested: 'Zahtevano',
+  excursionDetails: 'Podatki o ekskurziji',
+  showDataOnMap: 'Prikaži podatke na karti',
+  dateOfExcursion: 'Datum ekskurzije',
+  excursionDuration: 'Trajanje ekskurzije',
+  excursionPurpose: 'Namen ekskurzije',
+  excursionPurposes: {
+    'Ni znan': 'Ni znan',
+    'Merjenje jame': 'Merjenje jame',
+    'Popis živalstva': 'Popis živalstva',
+    'Ogled jame': 'Ogled jame',
+    'Določanje lege': 'Določanje lege',
+    'Zunanja akcija': 'Zunanja akcija',
+    Raziskave: 'Raziskave'
+  },
+  excursionStatus: 'Status ekskurzije',
+  excursionStatuses: {
+    Public: 'Public',
+    Private: 'Privatna',
+    ClubOnly: 'Samo za člane društva',
+    Registred: 'Samo za registrirane uporabnike'
+  },
+  author: 'Avtor'
 }
