@@ -21,6 +21,21 @@
         </ol-source-vector>
       </ol-vector-layer>
     </ol-map>
+    <q-page-sticky position="top-right" :offset="[18, 18]">
+      <q-fab
+      size="100px"
+        external-label
+        color="purple"
+        icon="layers"
+        direction="left"
+      >
+        <q-fab-action v-for="layer in mapStore.getLayers" :key="layer.name" padding="3px" label-class="bg-grey-3 text-grey-8" external-label label-position="bottom"
+          :color="layer.active ? 'red' : 'primary'"
+          @click="layer.active = !layer.active"
+          :icon="`img:${layer.preview}`"
+          :label="layer.label" />
+      </q-fab>
+    </q-page-sticky>
 
     <q-page-sticky position="bottom-left" :offset="[18, 18]">
       <q-btn fab :icon="isCenterFixed ? 'my_location' : 'location_searching'" color="accent" @click="myLocationClicked" />
@@ -41,11 +56,13 @@ import CartoLayers from 'src/components/map/layers/CartoLayers.vue'
 import LocationLayers from 'src/components/map/layers/LocationLayers.vue'
 import CustomLocationLayers from 'src/components/map/layers/CustomLocationLayers.vue'
 import { useLocationStore } from 'stores/location-store'
+import { useMapStore } from 'stores/map-store'
 export default defineComponent({
   name: 'IndexPage',
   components: { PageFullScreen, CartoLayers, LocationLayers, CustomLocationLayers },
   setup () {
     const store = useLocationStore()
+    const mapStore = useMapStore()
     const center = ref([1637531, 5766419])
     const projection = ref('EPSG:3857')
     const zoom = ref(8)
@@ -62,7 +79,8 @@ export default defineComponent({
       view,
       markLocations,
       goTo,
-      customLocations
+      customLocations,
+      mapStore
     }
   },
   data () {
