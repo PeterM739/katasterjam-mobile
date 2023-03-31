@@ -42,6 +42,14 @@
             <q-item-label>{{ $t('trips') }}</q-item-label>
           </q-item-section>
         </q-item>
+        <q-item clickable :to="{ name: 'custom-locations' }">
+          <q-item-section avatar>
+            <q-icon name="place" />
+          </q-item-section>
+          <q-item-section>
+            <q-item-label>{{ $t('customLocations') }}</q-item-label>
+          </q-item-section>
+        </q-item>
         <q-item clickable v-ripple @click.once="logOutButton">
           <q-item-section avatar>
             <q-icon name="logout" />

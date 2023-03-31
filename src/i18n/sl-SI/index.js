@@ -105,5 +105,8 @@ export default {
     ClubOnly: 'Samo za člane društva',
     Registred: 'Samo za registrirane uporabnike'
   },
-  author: 'Avtor'
+  author: 'Avtor',
+  customLocations: 'Točke uporabnikov',
+  searchForCustomLocation: 'Išči točke uporabnikov',
+  navigateToCustomLocation: 'Želite začeti navigacijo do te točke'
 }
