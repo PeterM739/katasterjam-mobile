@@ -1,6 +1,6 @@
 <template>
   <PageFullScreen style="background: #eee">
-    <ol-map loadTilesWhileAnimating loadTilesWhileInteracting style="height:100%;">
+    <ol-map loadTilesWhileAnimating loadTilesWhileInteracting style="height:100%;" ref="mapRef">
 
       <ol-view
         ref="view"
@@ -20,6 +20,7 @@
         <ol-source-vector :features="markLocations">
         </ol-source-vector>
       </ol-vector-layer>
+      <q-resize-observer @resize="onScreenOrientationChange" />
     </ol-map>
     <q-page-sticky position="top-right" :offset="[18, 18]">
       <q-fab
@@ -71,12 +72,14 @@ export default defineComponent({
     const goTo = ref(null)
 
     const view = ref('')
+    const mapRef = ref('')
     return {
       store,
       center,
       projection,
       zoom,
       view,
+      mapRef,
       markLocations,
       goTo,
       customLocations,
@@ -137,6 +140,9 @@ export default defineComponent({
       } else if (this.fixedCenter) {
         this.center = center
       }
+    },
+    onScreenOrientationChange () {
+      this.mapRef.updateSize()
     }
   },
   watch: {
