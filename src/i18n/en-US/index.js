@@ -105,5 +105,8 @@ export default {
     ClubOnly: 'Club members only',
     Registred: 'Registred uses only'
   },
-  author: 'Author'
+  author: 'Author',
+  customLocations: 'Custom locations',
+  searchForCustomLocation: 'Search for custom locations',
+  navigateToCustomLocation: 'Do you want to start navigation to this custom location'
 }

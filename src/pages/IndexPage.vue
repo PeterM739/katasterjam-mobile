@@ -15,7 +15,7 @@
       <LocationLayers
         :view="view"
         @centerChanged="centerChanged"/>
-
+      <CustomLocationLayers v-if="customLocations"/>
       <ol-vector-layer>
         <ol-source-vector :features="markLocations">
         </ol-source-vector>
@@ -54,17 +54,19 @@ import { Feature } from 'ol'
 import PageFullScreen from 'layouts/PageFullScreen.vue'
 import CartoLayers from 'src/components/map/layers/CartoLayers.vue'
 import LocationLayers from 'src/components/map/layers/LocationLayers.vue'
+import CustomLocationLayers from 'src/components/map/layers/CustomLocationLayers.vue'
 import { useLocationStore } from 'stores/location-store'
 import { useMapStore } from 'stores/map-store'
 export default defineComponent({
   name: 'IndexPage',
-  components: { PageFullScreen, CartoLayers, LocationLayers },
+  components: { PageFullScreen, CartoLayers, LocationLayers, CustomLocationLayers },
   setup () {
     const store = useLocationStore()
     const mapStore = useMapStore()
     const center = ref([1637531, 5766419])
     const projection = ref('EPSG:3857')
     const zoom = ref(8)
+    const customLocations = ref(false)
     const markLocations = ref([])
     const goTo = ref(null)
 
@@ -77,6 +79,7 @@ export default defineComponent({
       view,
       markLocations,
       goTo,
+      customLocations,
       mapStore
     }
   },
@@ -89,6 +92,7 @@ export default defineComponent({
       this.zoom = 15
       this.goTo = this.$route.query.navigate ? mark : null
     }
+    this.customLocations = this.$route.query.customLocation
 
     return {
       currentCenter: this.center,
