@@ -29,16 +29,11 @@
         icon="layers"
         direction="left"
       >
-        <q-fab-action padding="3px" margin="10px" label-class="bg-grey-3 text-grey-8" external-label label-position="bottom"
-          :color="mapStore.isSkyViewActive ? 'red' : 'primary'"
-          @click="mapStore.toggleSkyView"
-          icon="img:map/skyview.png"
-          label="Skyview" />
-        <q-fab-action padding="3px" label-class="bg-grey-3 text-grey-8" external-label label-position="bottom"
-          :color="mapStore.isOrthoPhotoActive ? 'red' : 'primary'"
-          @click="mapStore.toggleOrthoPhoto"
-          icon="img:map/ortophoto.png"
-          label="Ortho" />
+        <q-fab-action v-for="layer in mapStore.getLayers" :key="layer.name" padding="3px" label-class="bg-grey-3 text-grey-8" external-label label-position="bottom"
+          :color="layer.active ? 'red' : 'primary'"
+          @click="layer.active = !layer.active"
+          :icon="`img:${layer.preview}`"
+          :label="layer.label" />
       </q-fab>
     </q-page-sticky>
 
