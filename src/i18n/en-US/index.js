@@ -84,6 +84,28 @@ export default {
   searchForExcursion: 'Search for excursion by name',
   joinExcursionText: 'Are you sure you want to join excursion: ',
   requested: 'Requested',
+  excursionDetails: 'Excursion details',
+  showDataOnMap: 'Show data on map',
+  dateOfExcursion: 'Date of excursion',
+  excursionDuration: 'Excursion duration',
+  excursionPurpose: 'Excursion purpose',
+  excursionPurposes: {
+    'Ni znan': 'Unknown',
+    'Merjenje jame': 'Cave survey',
+    'Popis živalstva': 'Fauna survey',
+    'Ogled jame': 'Cave turism',
+    'Določanje lege': 'Locaiton correction',
+    'Zunanja akcija': 'Ridge walking',
+    Raziskave: 'Exploration'
+  },
+  excursionStatus: 'Excursion status',
+  excursionStatuses: {
+    Public: 'Public',
+    Private: 'Private',
+    ClubOnly: 'Club members only',
+    Registred: 'Registred uses only'
+  },
+  author: 'Author',
   customLocations: 'Custom locations',
   searchForCustomLocation: 'Search for custom locations',
   navigateToCustomLocation: 'Do you want to start navigation to this custom location'
