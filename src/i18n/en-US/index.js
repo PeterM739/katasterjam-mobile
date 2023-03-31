@@ -83,5 +83,8 @@ export default {
   joinExcursion: 'Join excursion',
   searchForExcursion: 'Search for excursion by name',
   joinExcursionText: 'Are you sure you want to join excursion: ',
-  requested: 'Requested'
+  requested: 'Requested',
+  customLocations: 'Custom locations',
+  searchForCustomLocation: 'Search for custom locations',
+  navigateToCustomLocation: 'Do you want to start navigation to this custom location'
 }

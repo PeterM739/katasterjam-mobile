@@ -20,7 +20,8 @@ const routes = [
       { path: '', name: 'home', component: () => import('pages/IndexPage.vue') },
       { path: '/caves', name: 'caves', component: () => import('pages/CaveSearchPage.vue') },
       { path: '/caves/details/:caveNumber', name: 'caves-details', component: () => import('pages/CaveDetailsPage.vue'), beforeEnter: caveResolver },
-      { path: '/trips', name: 'trips', component: () => import('pages/TripSearchPage.vue') }
+      { path: '/trips', name: 'trips', component: () => import('pages/TripSearchPage.vue') },
+      { path: '/custom-locations', name: 'custom-locations', component: () => import('pages/CustomLocationSearchPage.vue') }
     ]
   },
 

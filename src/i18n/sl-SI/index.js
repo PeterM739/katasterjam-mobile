@@ -83,5 +83,8 @@ export default {
   joinExcursion: 'Pridruži se',
   searchForExcursion: 'Išči ekskurzije po imenu',
   joinExcursionText: 'Ste prepričani, da se želite pridružit: ',
-  requested: 'Zahtevano'
+  requested: 'Zahtevano',
+  customLocations: 'Točke uporabnikov',
+  searchForCustomLocation: 'Išči točke uporabnikov',
+  navigateToCustomLocation: 'Želite začeti navigacijo do te točke'
 }
