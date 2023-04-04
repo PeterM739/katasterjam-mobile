@@ -1,19 +1,6 @@
 <template>
   <q-card class="cave-top">
-    <ol-map loadTilesWhileAnimating loadTilesWhileInteracting style="height:200px;">
-      <ol-view
-        ref="view"
-        :enableRotation="false"
-        :center="center"
-        :zoom="zoom"
-        :projection="projection"/>
-      <CartoLayers/>
-      <ol-vector-layer>
-        <ol-source-vector :features="markLocations">
-        </ol-source-vector>
-      </ol-vector-layer>
-    </ol-map>
-
+    <SimpleHeaderMap :center="center" :markLocations="markLocations"/>
     <q-card-section>
       <q-fab
         class="absolute"
@@ -49,9 +36,7 @@
         <tr>
           <td class="text-left table-row-fit">{{$t('organizations')}}</td>
           <td class="text-left table-row-fit">
-            <span v-bind:key="organization.id" v-for="(organization, index) in cave.organizations">
-              {{ organization.name }}<span v-if="index+1 < cave.organizations.length">, </span>
-            </span>
+            <OrganizationsList :organizations="cave.organizations"/>
           </td>
         </tr>
         <tr>
@@ -121,29 +106,24 @@ import { ref } from 'vue'
 import { fromLonLat } from 'ol/proj'
 import Point from 'ol/geom/Point'
 import { Feature } from 'ol'
-import CartoLayers from 'src/components/map/layers/CartoLayers.vue'
+import OrganizationsList from 'src/components/organizations/OrganizationsList.vue'
 import { api } from 'src/boot/axios'
 import { formatDate } from 'src/helpers/date'
+import SimpleHeaderMap from 'src/components/map/SimpleHeaderMap.vue'
 
 export default {
   name: 'CaveDetailsPage',
-  components: { CartoLayers },
+  components: { OrganizationsList, SimpleHeaderMap },
   setup () {
     const { dialog } = useQuasar()
     const center = ref([1637531, 5766419])
-    const projection = ref('EPSG:3857')
-    const zoom = ref(15)
     const markLocations = ref([])
-    const view = ref('')
     const cave = ref(null)
     const confirmRef = ref(null)
 
     return {
       confirmDialog: dialog,
       center,
-      projection,
-      zoom,
-      view,
       confirm: ref(false),
       markLocations,
       cave,
@@ -186,17 +166,6 @@ export default {
         query: {
           lat: this.cave.lat,
           lng: this.cave.lng
-        }
-      })
-    },
-    navigateToSelectedCave () {
-      this.$router.push({
-        path: '/',
-        query: {
-          lat: this.cave.lat,
-          lng: this.cave.lng,
-          navigate: true,
-          name: `${this.cave.caveNumber} - ${this.cave.name}`
         }
       })
     },
