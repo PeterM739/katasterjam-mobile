@@ -106,7 +106,29 @@ export default {
     Registred: 'Registred uses only'
   },
   author: 'Author',
-  customLocations: 'Custom locations',
+  customLocationDetails: 'Location details',
+  customLocations: 'Locations',
   searchForCustomLocation: 'Search for custom locations',
-  navigateToCustomLocation: 'Do you want to start navigation to this custom location'
+  navigateToCustomLocation: 'Do you want to start navigation to this custom location',
+  customLocationType: 'Custom location type',
+  customLocationTypes: {
+    Dihalnik: 'Blow hole',
+    'Nova jama': 'New cave',
+    'Zanimiva lokacija': 'Point of interest',
+    'Ni jama ampak zgleda kot jama': 'Not a cave'
+  },
+  customLocationStatus: 'Custom location status',
+  customLocationStatuses: {
+    'Za vse': 'Public',
+    'Samo zame': 'Private',
+    'Za člane društva': 'Club members only',
+    'Za registrirane uporabnike': 'Registred uses only'
+  },
+  latLng: 'Latitude, Longitude',
+  GKCoordinates: 'X GK, Y GK',
+  elevation: 'Elevation',
+  elevationAbrv: 'm.a.s.l.',
+  geology: 'Geology',
+  settlement: 'Settlement',
+  municipalty: 'Municipality'
 }

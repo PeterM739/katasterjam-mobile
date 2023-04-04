@@ -131,12 +131,11 @@ export default {
         })
       })
     },
-    customLocationClick (customLocationId) {
-      // TODO
-      // this.$router.push({
-      //   name: 'custom-location-details',
-      //   params: { customLocationId }
-      // })
+    customLocationClick (id) {
+      this.$router.push({
+        name: 'custom-locations-details',
+        params: { id }
+      })
     },
     showOnMapClick (customLocation) {
       this.$router.push({

@@ -10,6 +10,11 @@ const excursionResolver = async (to, from, next) => {
   to.meta.excursion = response.data
   next()
 }
+const customLocationResolver = async (to, from, next) => {
+  const response = await api.get(`/api/customLocations/${to.params.id}`)
+  to.meta.customLocation = response.data
+  next()
+}
 
 const routes = [
   {
@@ -27,7 +32,8 @@ const routes = [
       { path: '/caves/details/:caveNumber', name: 'caves-details', component: () => import('pages/CaveDetailsPage.vue'), beforeEnter: caveResolver },
       { path: '/trips', name: 'trips', component: () => import('pages/TripSearchPage.vue') },
       { path: '/trips/details/:id', name: 'trips-details', component: () => import('src/pages/TripDetailsPage.vue'), beforeEnter: excursionResolver },
-      { path: '/custom-locations', name: 'custom-locations', component: () => import('pages/CustomLocationSearchPage.vue') }
+      { path: '/custom-locations', name: 'custom-locations', component: () => import('pages/CustomLocationSearchPage.vue') },
+      { path: '/custom-locations/details/:id', name: 'custom-locations-details', component: () => import('src/pages/CustomLocationDetailsPage.vue'), beforeEnter: customLocationResolver }
     ]
   },
 
