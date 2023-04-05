@@ -130,5 +130,8 @@ export default {
   elevationAbrv: 'n. m. v.',
   geology: 'Geologija',
   settlement: 'Nasleje',
-  municipalty: 'Občina'
+  municipalty: 'Občina',
+  lat: 'Širina',
+  lng: 'Dolžina',
+  info: 'Informacija o kliku'
 }

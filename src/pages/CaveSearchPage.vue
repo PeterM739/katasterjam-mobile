@@ -127,7 +127,7 @@ export default {
     caveClick (caveNumber) {
       this.$router.push({
         name: 'caves-details',
-        params: { caveNumber }
+        params: { id: caveNumber }
       })
     },
     showOnMapClick (cave) {

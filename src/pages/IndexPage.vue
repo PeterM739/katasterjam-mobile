@@ -1,6 +1,11 @@
 <template>
   <PageFullScreen style="background: #eee">
-    <ol-map loadTilesWhileAnimating loadTilesWhileInteracting style="height:100%;" ref="mapRef">
+    <ol-map
+      loadTilesWhileAnimating
+      loadTilesWhileInteracting
+      style="height:100%;"
+      moveTolerance="5"
+      ref="mapRef">
 
       <ol-view
         ref="view"
@@ -44,6 +49,7 @@
     <q-page-sticky position="bottom-right" :offset="[18, 18]">
       <q-btn fab :icon="trackLocationIcon ? 'stop_circle' : 'play_arrow'" color="accent" @click="trackingClicked" />
     </q-page-sticky>
+    <DetailsDrawer />
   </PageFullScreen>
 </template>
 
@@ -56,11 +62,12 @@ import PageFullScreen from 'layouts/PageFullScreen.vue'
 import CartoLayers from 'src/components/map/layers/CartoLayers.vue'
 import LocationLayers from 'src/components/map/layers/LocationLayers.vue'
 import CustomLocationLayers from 'src/components/map/layers/CustomLocationLayers.vue'
+import DetailsDrawer from 'src/components/map/drawer/DetailsDrawer.vue'
 import { useLocationStore } from 'stores/location-store'
 import { useMapStore } from 'stores/map-store'
 export default defineComponent({
   name: 'IndexPage',
-  components: { PageFullScreen, CartoLayers, LocationLayers, CustomLocationLayers },
+  components: { PageFullScreen, CartoLayers, LocationLayers, CustomLocationLayers, DetailsDrawer },
   setup () {
     const store = useLocationStore()
     const mapStore = useMapStore()
@@ -73,6 +80,8 @@ export default defineComponent({
 
     const view = ref('')
     const mapRef = ref('')
+    mapStore.saveMapRef(mapRef)
+
     return {
       store,
       center,
@@ -116,6 +125,12 @@ export default defineComponent({
     }
   },
   methods: {
+    async onMapClick (evt) {
+      if (evt.coordinate) {
+        const featuresClick = this.mapRef.map.getFeaturesAtPixel(evt.pixel)
+        await this.mapStore.mapClick(evt.coordinate, featuresClick)
+      }
+    },
     zoomChanged (currentZoom) {
       this.currentZoom = currentZoom
     },
@@ -152,6 +167,13 @@ export default defineComponent({
         this.store.startNavigation(this.goTo)
       }
     }
+  },
+  mounted () {
+    this.mapRef.map.on('click', async (evt) => {
+      setTimeout(async () => {
+        await this.onMapClick(evt)
+      }, '100')
+    })
   }
 })
 </script>

@@ -130,5 +130,8 @@ export default {
   elevationAbrv: 'm.a.s.l.',
   geology: 'Geology',
   settlement: 'Settlement',
-  municipalty: 'Municipality'
+  municipalty: 'Municipality',
+  lat: 'Latitude',
+  lng: 'Longitude',
+  clickInfo: 'Click info'
 }
