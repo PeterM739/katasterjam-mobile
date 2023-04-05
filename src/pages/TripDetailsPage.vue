@@ -39,7 +39,7 @@
         <tr>
           <td class="text-left table-row-fit">{{$t('caves')}}</td>
           <td class="text-left table-row-fit">
-            <span v-bind:key="cave.caveNumber" v-for="(cave, index) in excursion.caves">
+            <span :key="cave.caveNumber" v-for="(cave, index) in excursion.caves">
               {{ cave.caveNumber }} - {{ cave.name }}<span v-if="index+1 < excursion.caves.length">, </span>
             </span>
           </td>
@@ -47,9 +47,7 @@
         <tr>
           <td class="text-left table-row-fit">{{$t('organizations')}}</td>
           <td class="text-left table-row-fit">
-            <span v-bind:key="organization.id" v-for="(organization, index) in excursion.organizations">
-              {{ organization.name }}<span v-if="index+1 < excursion.organizations.length">, </span>
-            </span>
+            <OrganizationsList :organizations="excursion.organizations"/>
           </td>
         </tr>
         <tr>
@@ -86,8 +84,10 @@ import { useQuasar } from 'quasar'
 import { ref } from 'vue'
 import { formatDate } from 'src/helpers/date'
 import { api } from 'src/boot/axios'
+import OrganizationsList from 'src/components/organizations/OrganizationsList.vue'
 export default {
   name: 'ExcursionDetailsPage',
+  components: { OrganizationsList },
   setup () {
     const { dialog } = useQuasar()
     const excursion = ref(null)

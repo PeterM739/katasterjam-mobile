@@ -106,7 +106,29 @@ export default {
     Registred: 'Samo za registrirane uporabnike'
   },
   author: 'Avtor',
+  customLocationDetails: 'Podatki točke',
   customLocations: 'Točke uporabnikov',
   searchForCustomLocation: 'Išči točke uporabnikov',
-  navigateToCustomLocation: 'Želite začeti navigacijo do te točke'
+  navigateToCustomLocation: 'Želite začeti navigacijo do te točke',
+  customLocationType: 'Tip točke',
+  customLocationTypes: {
+    Dihalnik: 'Dihalnik',
+    'Nova jama': 'Nova jama',
+    'Zanimiva lokacija': 'Zanimiva lokacija',
+    'Ni jama ampak zgleda kot jama': 'Ni jama ampak zgleda kot jama'
+  },
+  customLocationStatus: 'Status točke',
+  customLocationStatuses: {
+    'Za vse': 'Za vse',
+    'Samo zame': 'Samo zame',
+    'Za člane društva': 'Za člane društva',
+    'Za registrirane uporabnike': 'Za registrirane uporabnike'
+  },
+  latLng: 'Latitude, Longitude',
+  GKCoordinates: 'X GK, Y GK',
+  elevation: 'Nadmorska višina',
+  elevationAbrv: 'n. m. v.',
+  geology: 'Geologija',
+  settlement: 'Nasleje',
+  municipalty: 'Občina'
 }

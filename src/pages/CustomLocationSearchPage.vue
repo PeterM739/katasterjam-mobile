@@ -32,9 +32,7 @@
               <q-item-label lines="1"><span v-if="customLocation.isAuthor"><q-icon name="check" /></span> {{ customLocation.id }} - {{ customLocation.name }}</q-item-label>
               <q-item-label caption>{{$t('type')}}: {{ customLocation.type }}, {{$t('date')}}: {{ formatDate(customLocation.createdDate) }}</q-item-label>
               <q-item-label caption>
-                {{$t('organizations')}}: <span v-bind:key="organization.id" v-for="(organization, index) in customLocation.organizations">
-                  {{ organization.name }}<span v-if="index+1 < customLocation.organizations.length">, </span>
-                 </span>
+                {{$t('organizations')}}: <OrganizationsList :organizations="customLocation.organizations"/>
               </q-item-label>
               <q-item-label v-if="customLocation.distance" caption>{{$t('distance')}}: {{ parseInt(customLocation.distance) }} m</q-item-label>
               </q-item-section>
@@ -57,8 +55,10 @@ import { useQuasar } from 'quasar'
 import { ref } from 'vue'
 import { useCustomLocationStore } from 'stores/custom-location-store'
 import { formatDate } from 'src/helpers/date'
+import OrganizationsList from 'src/components/organizations/OrganizationsList.vue'
 export default {
   name: 'CustomLocationSearchPage',
+  components: { OrganizationsList },
   setup () {
     const { dialog } = useQuasar()
     const store = useCustomLocationStore()
@@ -131,12 +131,11 @@ export default {
         })
       })
     },
-    customLocationClick (customLocationId) {
-      // TODO
-      // this.$router.push({
-      //   name: 'custom-location-details',
-      //   params: { customLocationId }
-      // })
+    customLocationClick (id) {
+      this.$router.push({
+        name: 'custom-locations-details',
+        params: { id }
+      })
     },
     showOnMapClick (customLocation) {
       this.$router.push({
