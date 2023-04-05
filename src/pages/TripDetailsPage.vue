@@ -39,7 +39,7 @@
         <tr>
           <td class="text-left table-row-fit">{{$t('caves')}}</td>
           <td class="text-left table-row-fit">
-            <span v-bind:key="cave.caveNumber" v-for="(cave, index) in excursion.caves">
+            <span :key="cave.caveNumber" v-for="(cave, index) in excursion.caves">
               {{ cave.caveNumber }} - {{ cave.name }}<span v-if="index+1 < excursion.caves.length">, </span>
             </span>
           </td>
