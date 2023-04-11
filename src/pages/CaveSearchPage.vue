@@ -51,12 +51,12 @@
 
 import { useQuasar } from 'quasar'
 import { ref } from 'vue'
-import { useCavesStore } from 'stores/cave-store'
+import { useLocalCavesStore } from 'stores/local-cave-store'
 export default {
   name: 'CaveSearchPage',
   setup () {
     const { dialog } = useQuasar()
-    const store = useCavesStore()
+    const store = useLocalCavesStore()
 
     if (store.getCaves.length === 0) {
       store.searchForCaves().then(() => {

@@ -51,7 +51,7 @@
 
 <script>
 import { useAuthStore } from 'stores/auth-store'
-import { useCavesStore } from 'stores/local-cave-store'
+import { useLocalCavesStore } from 'stores/local-cave-store'
 import { ref, computed } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useQuasar } from 'quasar'
@@ -59,7 +59,7 @@ export default {
   name: 'LoginPage',
   setup () {
     const store = useAuthStore()
-    const cavesStore = useCavesStore()
+    const cavesStore = useLocalCavesStore()
     const progress = ref(0.0)
     const { getPageNumber } = storeToRefs(cavesStore)
 
