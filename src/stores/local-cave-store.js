@@ -116,15 +116,7 @@ export const useLocalCavesStore = defineStore('caves', {
       this.searchParameters.sort = 'distance'
       if (Platform.is.cordova) {
         window.BackgroundGeolocation.getCurrentLocation(async (location) => {
-          const caves = (await db.caves.toArray()).map(cave => {
-            const distance = getDistance([cave.lng, cave.lat], [location.longitude, location.latitude])
-            return {
-              ...cave,
-              distance
-            }
-          })
-          const closestCaves = caves.sort((a, b) => a.distance - b.distance)
-            .slice((this.searchParameters.pageNumber - 1) * this.searchParameters.pageSize, this.searchParameters.pageSize)
+          const closestCaves = await this.getClosestCavesFor(location)
 
           if (this.searchParameters.pageNumber > 1) {
             closestCaves.map(cave => this.caves.push(cave))
@@ -138,16 +130,7 @@ export const useLocalCavesStore = defineStore('caves', {
         })
       } else {
         navigator.geolocation.getCurrentPosition(async (position) => {
-          const caves = (await db.caves.toArray()).map(cave => {
-            const distance = getDistance([cave.lng, cave.lat], [position.coords.longitude, position.coords.latitude])
-            return {
-              ...cave,
-              distance
-            }
-          })
-          const skip = (this.searchParameters.pageNumber - 1) * this.searchParameters.pageSize
-          const closestCaves = caves.sort((a, b) => a.distance - b.distance)
-            .slice(skip, skip + this.searchParameters.pageSize)
+          const closestCaves = await this.getClosestCavesFor(position.coords)
 
           if (this.searchParameters.pageNumber > 1) {
             closestCaves.map(cave => this.caves.push(cave))
@@ -158,6 +141,20 @@ export const useLocalCavesStore = defineStore('caves', {
           console.log(error)
         })
       }
+    },
+    async getClosestCavesFor (coordinates) {
+      const caves = (await db.caves.toArray()).map(cave => {
+        const distance = getDistance([cave.lng, cave.lat], [coordinates.longitude, coordinates.latitude])
+        return {
+          ...cave,
+          distance
+        }
+      })
+      const skip = (this.searchParameters.pageNumber - 1) * this.searchParameters.pageSize
+
+      return caves.sort((a, b) => a.distance - b.distance)
+        .slice(skip, skip + this.searchParameters.pageSize)
     }
+
   }
 })
