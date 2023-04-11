@@ -131,5 +131,8 @@ export default {
   geology: 'Geologija',
   settlement: 'Nasleje',
   municipalty: 'Občina',
-  fetchingData: 'Nabiranje podatkov ...'
+  fetchingData: 'Nabiranje podatkov ...',
+  lat: 'Širina',
+  lng: 'Dolžina',
+  info: 'Informacija o kliku'
 }
