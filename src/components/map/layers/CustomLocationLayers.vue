@@ -3,7 +3,10 @@
     <ol-source-vector ref="vectorSource">
     <ol-feature v-for="customLocation in customLocations" :key="customLocation.id" :properties="{
         'id': customLocation.id,
-        'name': customLocation.name
+        'name': customLocation.name,
+        'lat': customLocation.lat.toFixed(5),
+        'lng': customLocation.lng.toFixed(5),
+        'type': 'poi'
       }">
         <ol-geom-point :coordinates="customLocation.latLng"></ol-geom-point>
 
@@ -26,8 +29,6 @@ export default {
     const customLocations = ref([])
     const vectorSource = ref(new VectorSource())
     store.loadForMap().then(() => {
-      console.log('locations loaded')
-
       store.customLocationsForMap.map(cl => customLocations.value.push(cl))
     })
 
