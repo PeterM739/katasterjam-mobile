@@ -1,7 +1,8 @@
 <template>
   <div class="q-pa-md q-gutter-sm">
-    <q-dialog v-model="dialog" position="bottom" @hide="hideDrawer">
+    <q-dialog v-model="dialog" position="bottom" @hide="hideDrawer" seamless>
       <q-card style="width: 350px;">
+
         <q-card-section v-if="drawerLoading" class="row justify-center items-center" >
           <q-spinner
             color="primary"
@@ -9,17 +10,23 @@
             :thickness="2"
           />
         </q-card-section>
-        <q-card-section v-else class="row items-center no-wrap">
-          <div>
+        <template v-else>
+          <q-card-section class="row items-center q-pb-none">
             <div class="text-weight-bold" v-if="clickedFeature.type !== 'click'">[{{ clickedFeature.id }}] {{ clickedFeature.name }}</div>
             <div class="text-weight-bold" v-else>{{ $t('clickInfo') }}:</div>
-            <div class="text-grey" v-if="clickedFeature.type === 'cave'">{{ $t('length') }}: {{ clickedFeature.length }} m, {{ $t('depth') }}: {{ clickedFeature.depth }} m</div>
-            <div class="text-grey">{{ $t('lat') }}: {{ clickedFeature.lat }}, {{ $t('lng') }}: {{ clickedFeature.lng }}</div>
-          </div>
-          <q-space />
-          <q-btn flat round icon="info" v-if="clickedFeature.type !== 'click'" @click="info(clickedFeature.id)"/>
-          <q-btn flat round icon="assist_walker"  @click="goTo()"/>
-        </q-card-section>
+            <q-space />
+            <q-btn icon="close" flat round dense v-close-popup />
+          </q-card-section>
+          <q-card-section class="row items-center no-wrap">
+            <div>
+              <div class="text-grey" v-if="clickedFeature.type === 'cave'">{{ $t('length') }}: {{ clickedFeature.length }} m, {{ $t('depth') }}: {{ clickedFeature.depth }} m</div>
+              <div class="text-grey">{{ $t('lat') }}: {{ clickedFeature.lat }}, {{ $t('lng') }}: {{ clickedFeature.lng }}</div>
+            </div>
+            <q-space />
+            <q-btn flat round icon="info" v-if="clickedFeature.type !== 'click'" @click="info(clickedFeature.id)"/>
+            <q-btn flat round icon="assist_walker"  @click="goTo()"/>
+          </q-card-section>
+        </template>
       </q-card>
     </q-dialog>
   </div>

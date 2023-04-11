@@ -170,9 +170,7 @@ export default defineComponent({
   },
   mounted () {
     this.mapRef.map.on('click', async (evt) => {
-      setTimeout(async () => {
-        await this.onMapClick(evt)
-      }, '100')
+      await this.onMapClick(evt)
     })
   }
 })
