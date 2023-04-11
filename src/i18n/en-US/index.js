@@ -130,5 +130,6 @@ export default {
   elevationAbrv: 'm.a.s.l.',
   geology: 'Geology',
   settlement: 'Settlement',
-  municipalty: 'Municipality'
+  municipalty: 'Municipality',
+  fetchingData: 'Fetching data'
 }
