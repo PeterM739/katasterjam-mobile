@@ -112,6 +112,11 @@ export const useLocalCavesStore = defineStore('caves', {
     addQueryParameter (query) {
       this.searchParameters.query = query
     },
+    async get (caveNumber) {
+      const cave = await db.caves.where('caveNumber').equals(parseInt(caveNumber)).first()
+
+      return cave
+    },
     async searchForNearbyCaves () {
       this.searchParameters.sort = 'distance'
       if (Platform.is.cordova) {

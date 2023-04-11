@@ -33,37 +33,37 @@
     <q-separator />
     <q-markup-table>
       <tbody>
-        <tr>
+        <tr v-if="cave.organizations">
           <td class="text-left table-row-fit">{{$t('organizations')}}</td>
           <td class="text-left table-row-fit">
             <OrganizationsList :organizations="cave.organizations"/>
           </td>
         </tr>
-        <tr>
+        <tr v-if="cave.dateOfExcursion">
           <td class="text-left table-row-fit">{{$t('dateOfDiscovery')}}</td>
           <td class="text-left table-row-fit">{{ formatDate(cave.dateOfExcursion) }}</td>
         </tr>
-        <tr>
+        <tr v-if="cave.author">
           <td class="text-left table-row-fit">{{$t('authorsOfReport')}}</td>
           <td class="text-left table-row-fit">{{ cave.author }}</td>
         </tr>
-        <tr>
+        <tr v-if="cave.team">
           <td class="text-left table-row-fit">{{$t('discoverers')}}</td>
           <td class="text-left table-row-fit">{{ cave.team }}</td>
         </tr>
-        <tr>
+        <tr v-if="cave.dateOfSubmission">
           <td class="text-left table-row-fit">{{$t('importDate')}}</td>
           <td class="text-left table-row-fit">{{ formatDate(cave.dateOfSubmission) }}</td>
         </tr>
-        <tr>
+        <tr v-if="cave.notes">
           <td class="text-left table-row-fit">{{$t('note')}}</td>
           <td class="text-left table-row-fit">{{ cave.notes }}</td>
         </tr>
-        <tr>
+        <tr v-if="cave.turisticCave">
           <td class="text-left table-row-fit">{{$t('showCave')}}</td>
           <td class="text-left table-row-fit">{{ (cave.turisticCave ? 'Yes' : 'No')}}</td>
         </tr>
-        <tr>
+        <tr v-if="cave.caveTypes">
           <td class="text-left table-row-fit">{{$t('type')}}</td>
           <td class="text-left table-row-fit">
             <span v-for="({name, description}, idx) in cave.caveTypes" :key="idx">
@@ -71,7 +71,7 @@
             </span>
           </td>
         </tr>
-        <tr>
+        <tr v-if="cave.xcoordinate">
           <td class="text-left table-row-fit">{{$t('dk48')}}</td>
           <td class="text-left table-row-fit">{{ cave.xcoordinate }}, {{ cave.ycoordinate }}</td>
         </tr>
@@ -79,19 +79,19 @@
           <td class="text-left table-row-fit">{{$t('wgs84')}}</td>
           <td class="text-left table-row-fit">{{ cave.lng.toFixed(5) }}, {{ cave.lat.toFixed(5) }}</td>
         </tr>
-        <tr>
+        <tr v-if="cave.entranceElevation">
           <td class="text-left table-row-fit">{{$t('entranceElevation')}}</td>
           <td class="text-left table-row-fit">{{ cave.entranceElevation }} m</td>
         </tr>
-        <tr>
+        <tr v-if="cave.settlement">
           <td class="text-left table-row-fit">{{$t('closestTown')}}</td>
           <td class="text-left table-row-fit">{{ cave.settlement?.name }}</td>
         </tr>
-        <tr>
+        <tr v-if="cave.settlement">
           <td class="text-left table-row-fit">{{$t('municipality')}}</td>
           <td class="text-left table-row-fit">{{ cave.settlement?.municipality }}</td>
         </tr>
-        <tr>
+        <tr v-if="cave.kadasterMunicipality">
           <td class="text-left table-row-fit">{{$t('kadasterMunicipality')}}</td>
           <td class="text-left table-row-fit">{{ cave.kadasterMunicipality?.name }}</td>
         </tr>
