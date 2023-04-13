@@ -32,6 +32,15 @@
               <q-card-section class="text-center q-pa-none">
                 <p class="text-grey-6">{{ $t('register') }}</p>
               </q-card-section>
+              <q-card-section class="text-center q-pa-none" v-if="loggingIn">
+                <p class="text-grey-6">{{ $t('fetchingData') }}</p>
+                <q-linear-progress size="50px" :value="progress" color="accent" class="q-mt-sm">
+
+                  <div class="absolute-full flex flex-center">
+                    <q-badge color="white" text-color="accent" :label="progressLabel" />
+                  </div>
+                </q-linear-progress>
+              </q-card-section>
             </q-card>
           </div>
         </div>
@@ -42,18 +51,27 @@
 
 <script>
 import { useAuthStore } from 'stores/auth-store'
-import { ref } from 'vue'
+import { useLocalCavesStore } from 'stores/local-cave-store'
+import { ref, computed } from 'vue'
+import { storeToRefs } from 'pinia'
 import { useQuasar } from 'quasar'
 export default {
   name: 'LoginPage',
   setup () {
     const store = useAuthStore()
+    const cavesStore = useLocalCavesStore()
+    const progress = ref(0.0)
+    const { getPageNumber } = storeToRefs(cavesStore)
 
     const { notify } = useQuasar()
     return {
       notify,
       loggingIn: ref(false),
-      store
+      store,
+      cavesStore,
+      progress,
+      progressLabel: computed(() => (progress.value * 100).toFixed(2) + '%'),
+      getPageNumber
     }
   },
   data () {
@@ -62,6 +80,11 @@ export default {
         email: '',
         password: ''
       }
+    }
+  },
+  watch: {
+    getPageNumber (newValue, oldValue) {
+      this.progress = newValue / this.cavesStore.totalPages
     }
   },
   methods: {
@@ -76,6 +99,7 @@ export default {
         const result = await this.store.login(payload)
 
         if (result.success) {
+          await this.cavesStore.tryFetchCavesForOffline()
           this.$router.replace('/')
         } else {
           console.error(result.message[0])

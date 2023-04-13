@@ -1,8 +1,15 @@
 import { api } from 'src/boot/axios'
+import { useLocalCavesStore } from '../stores/local-cave-store'
 
 const caveResolver = async (to, from, next) => {
-  const response = await api.get(`/api/caves/${to.params.id}`)
-  to.meta.cave = response.data
+  if (navigator.connection.type && navigator.connection.type === 'none') {
+    const store = useLocalCavesStore()
+    const cave = await store.get(to.params.id)
+    to.meta.cave = cave
+  } else {
+    const response = await api.get(`/api/caves/${to.params.id}`)
+    to.meta.cave = response.data
+  }
   next()
 }
 const excursionResolver = async (to, from, next) => {

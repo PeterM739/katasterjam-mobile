@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
 import * as olProj from 'ol/proj'
 import { EsriJSON } from 'ol/format'
+import { useLocalCavesStore } from './local-cave-store'
 
 export const useMapStore = defineStore('map', {
   state: () => ({
@@ -60,16 +61,16 @@ export const useMapStore = defineStore('map', {
             ...features[0].values_
           }
         } else {
-          const result = await this.getRemoteFeatures(coordinates)
-          if (result.length > 0) {
-            const cave = result[0]
+          const result = await this.getCavesFromLocalStorage(coordinates)
+          if (result) {
+            const cave = result
             this.clickedFeature = {
-              id: cave.values_.CaveNumber,
-              name: cave.values_.Name,
-              lat: cave.values_.Lat,
-              lng: cave.values_.Lon,
-              length: cave.values_.Length,
-              depth: cave.values_.Depth,
+              id: cave.caveNumber,
+              name: cave.name,
+              lat: cave.lat,
+              lng: cave.lon,
+              length: cave.length,
+              depth: cave.depth,
               type: 'cave'
             }
           }
@@ -85,6 +86,22 @@ export const useMapStore = defineStore('map', {
     },
     saveMapRef (mapRef) {
       this.mapRef = mapRef
+    },
+    async getCavesFromLocalStorage (coordinates) {
+      const lngLat = olProj.toLonLat(coordinates)
+      const store = useLocalCavesStore()
+      let distance = 4000 / Math.pow(2, (this.getMap.getView().getZoom() - 9))
+      distance = distance < 5 ? 5 : distance
+      const closestCaves = await store.getClosestCavesFor({
+        longitude: lngLat[0],
+        latitude: lngLat[1]
+      })
+
+      if (closestCaves.length > 0 && closestCaves[0].distance <= distance) {
+        return closestCaves[0]
+      }
+
+      return null
     },
     async getRemoteFeatures (coordinate) {
       let distance = 4000 / Math.pow(2, (this.getMap.getView().getZoom() - 9))
