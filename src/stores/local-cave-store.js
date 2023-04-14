@@ -67,6 +67,7 @@ export const useLocalCavesStore = defineStore('caves', {
         })
         await db.caves.bulkPut(caves)
       }
+      this.searchParameters.pageNumber = 0
       this.searchParameters.pageSize = 10
     },
     async searchForCaves () {
