@@ -21,8 +21,6 @@ const excursionResolver = async (to, from, next) => {
 }
 const customLocationResolver = async (to, from, next) => {
   const store = useLocalCustomLocationStore()
-  const customLocation = await store.get(to.params.id)
-  to.meta.customLocation = customLocation
   if (navigator.connection.type && navigator.connection.type === 'none') {
     const customLocation = await store.get(to.params.id)
     to.meta.customLocation = customLocation

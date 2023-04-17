@@ -1,19 +1,32 @@
 import { defineStore } from 'pinia'
+import { Platform } from 'quasar'
+import { getDistance } from 'ol/sphere'
+import * as olProj from 'ol/proj'
 import { api } from 'src/boot/axios'
 import { db } from 'src/db/db'
 import { getLongDateNow } from 'src/helpers/date'
-import { Platform } from 'quasar'
-import { getDistance } from 'ol/sphere'
+
+import iconNewCave from '../assets/map/markers/x_yellow.png'
+import iconBlowHole from '../assets/map/markers/x_purple.png'
+import iconPoi from '../assets/map/markers/x_orange.png'
+import iconNotCave from '../assets/map/markers/x_red.png'
 
 export const useLocalCustomLocationStore = defineStore('local-custom-locations', {
   state: () => ({
     customLocations: [],
+    customLocationsForMap: [],
     searchParameters: {
       query: '',
       lastUpdated: null,
       pageNumber: 1,
       pageSize: 10,
       sort: ''
+    },
+    locationIcons: {
+      1: iconBlowHole,
+      2: iconNewCave,
+      3: iconPoi,
+      4: iconNotCave
     },
     totalPages: 0
   }),
@@ -149,6 +162,16 @@ export const useLocalCustomLocationStore = defineStore('local-custom-locations',
 
       return customLocations.sort((a, b) => a.distance - b.distance)
         .slice(skip, skip + this.searchParameters.pageSize)
+    },
+    async loadForMap () {
+      this.customLocationsForMap = (await db.customLocations.toArray()).map(location => {
+        location.latLng = olProj.fromLonLat([location.lng, location.lat])
+        location.icon = this.locationIcons[location.typeId]
+
+        return location
+      })
+
+      return this.customLocationsForMap
     }
   }
 })
