@@ -39,6 +39,9 @@ export const useLocalCustomLocationStore = defineStore('local-custom-locations',
     },
     getPageNumber (state) {
       return state.searchParameters.pageNumber
+    },
+    getCurrentSort (state) {
+      return state.searchParameters.sort
     }
   },
   actions: {
@@ -55,6 +58,13 @@ export const useLocalCustomLocationStore = defineStore('local-custom-locations',
     },
     incrementPageNumber () {
       this.searchParameters.pageNumber++
+    },
+    loadCustomLocations (customLocations) {
+      if (this.searchParameters.pageNumber > 1) {
+        customLocations.map(customLocation => this.customLocations.push(customLocation))
+      } else {
+        this.customLocations = customLocations
+      }
     },
     async get (id) {
       const result = await db.customLocations.where('id').equals(parseInt(id)).first()
@@ -104,7 +114,11 @@ export const useLocalCustomLocationStore = defineStore('local-custom-locations',
       if (this.searchParameters.query && isNaN(this.searchParameters.query)) {
         const queryLower = this.searchParameters.query.toLowerCase()
         query = query.filter((item) => {
-          return item.name.toLowerCase().indexOf(queryLower) > -1
+          if (item.name) {
+            return item.name.toLowerCase().indexOf(queryLower) > -1
+          }
+
+          return false
         })
       }
 
@@ -114,23 +128,18 @@ export const useLocalCustomLocationStore = defineStore('local-custom-locations',
         .toArray()
 
       const localCustomLocations = await queryWithOffset
-      if (this.searchParameters.pageNumber > 1) {
-        localCustomLocations.map(customLocation => this.customLocations.push(customLocation))
-      } else {
-        this.customLocations = localCustomLocations
-      }
+      this.loadCustomLocations(localCustomLocations)
     },
     async searchForNearby () {
-      this.searchParameters.sort = 'distance'
+      if (this.searchParameters.sort !== 'distance') {
+        this.searchParameters.sort = 'distance'
+        this.searchParameters.pageNumber = 1
+      }
       if (Platform.is.cordova) {
         window.BackgroundGeolocation.getCurrentLocation(async (location) => {
           const closestCustomLocations = await this.getClosestFor(location)
 
-          if (this.searchParameters.pageNumber > 1) {
-            closestCustomLocations.map(customLocation => this.customLocations.push(customLocation))
-          } else {
-            this.customLocations = closestCustomLocations
-          }
+          this.loadCustomLocations(closestCustomLocations)
         }, (code, message) => {
           console.error('Error when trying to fetch location', code, message)
         }, {
@@ -140,11 +149,7 @@ export const useLocalCustomLocationStore = defineStore('local-custom-locations',
         navigator.geolocation.getCurrentPosition(async (position) => {
           const closestCustomLocations = await this.getClosestFor(position.coords)
 
-          if (this.searchParameters.pageNumber > 1) {
-            closestCustomLocations.map(customLocation => this.customLocations.push(customLocation))
-          } else {
-            this.customLocations = closestCustomLocations
-          }
+          this.loadCustomLocations(closestCustomLocations)
         }, (error) => {
           console.log(error)
         })
@@ -159,6 +164,7 @@ export const useLocalCustomLocationStore = defineStore('local-custom-locations',
         }
       })
       const skip = (this.searchParameters.pageNumber - 1) * this.searchParameters.pageSize
+      this.totalPages = Math.ceil(await db.customLocations.count() / this.searchParameters.pageSize)
 
       return customLocations.sort((a, b) => a.distance - b.distance)
         .slice(skip, skip + this.searchParameters.pageSize)
