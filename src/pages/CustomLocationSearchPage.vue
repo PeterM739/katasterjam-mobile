@@ -53,7 +53,7 @@
 
 import { useQuasar } from 'quasar'
 import { ref } from 'vue'
-import { useCustomLocationStore } from 'stores/custom-location-store'
+import { useLocalCustomLocationStore } from 'stores/local-custom-location-store'
 import { formatDate } from 'src/helpers/date'
 import OrganizationsList from 'src/components/organizations/OrganizationsList.vue'
 export default {
@@ -61,8 +61,10 @@ export default {
   components: { OrganizationsList },
   setup () {
     const { dialog } = useQuasar()
-    const store = useCustomLocationStore()
-
+    const store = useLocalCustomLocationStore()
+    store.tryFetchCustomLocationsForOffline().then(() => {
+      console.log('Custom location list updated')
+    })
     if (store.getCustomLocations.length === 0) {
       store.search().then(() => {
         console.log('custom locations loaded')

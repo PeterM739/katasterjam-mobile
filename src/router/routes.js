@@ -1,14 +1,16 @@
 import { api } from 'src/boot/axios'
 import { useLocalCavesStore } from '../stores/local-cave-store'
+import { useLocalCustomLocationStore } from '../stores/local-custom-location-store'
 
 const caveResolver = async (to, from, next) => {
+  const store = useLocalCavesStore()
   if (navigator.connection.type && navigator.connection.type === 'none') {
-    const store = useLocalCavesStore()
     const cave = await store.get(to.params.id)
     to.meta.cave = cave
   } else {
     const response = await api.get(`/api/caves/${to.params.id}`)
     to.meta.cave = response.data
+    await store.put(response.data)
   }
   next()
 }
@@ -18,8 +20,17 @@ const excursionResolver = async (to, from, next) => {
   next()
 }
 const customLocationResolver = async (to, from, next) => {
-  const response = await api.get(`/api/customLocations/${to.params.id}`)
-  to.meta.customLocation = response.data
+  const store = useLocalCustomLocationStore()
+  const customLocation = await store.get(to.params.id)
+  to.meta.customLocation = customLocation
+  if (navigator.connection.type && navigator.connection.type === 'none') {
+    const customLocation = await store.get(to.params.id)
+    to.meta.customLocation = customLocation
+  } else {
+    const response = await api.get(`/api/customLocations/${to.params.id}`)
+    to.meta.customLocation = response.data
+    await store.put(response.data)
+  }
   next()
 }
 
