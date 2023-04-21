@@ -4,14 +4,16 @@ import { useLocalCustomLocationStore } from '../stores/local-custom-location-sto
 
 const caveResolver = async (to, from, next) => {
   const store = useLocalCavesStore()
-  if (navigator.connection.type && navigator.connection.type === 'none') {
-    const cave = await store.get(to.params.id)
-    to.meta.cave = cave
-  } else {
+  const cave = await store.get(to.params.id)
+  to.meta.cave = cave
+  try {
     const response = await api.get(`/api/caves/${to.params.id}`)
     to.meta.cave = response.data
     await store.put(response.data)
+  } catch (error) {
+    console.log('Could not load caves. Error: ', error)
   }
+
   next()
 }
 const excursionResolver = async (to, from, next) => {
@@ -21,14 +23,16 @@ const excursionResolver = async (to, from, next) => {
 }
 const customLocationResolver = async (to, from, next) => {
   const store = useLocalCustomLocationStore()
-  if (navigator.connection.type && navigator.connection.type === 'none') {
-    const customLocation = await store.get(to.params.id)
-    to.meta.customLocation = customLocation
-  } else {
+  const customLocation = await store.get(to.params.id)
+  to.meta.customLocation = customLocation
+  try {
     const response = await api.get(`/api/customLocations/${to.params.id}`)
     to.meta.customLocation = response.data
     await store.put(response.data)
+  } catch (error) {
+    console.log('Could not load custom locations. Error: ', error)
   }
+
   next()
 }
 
