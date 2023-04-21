@@ -52,6 +52,7 @@
 <script>
 import { useAuthStore } from 'stores/auth-store'
 import { useLocalCavesStore } from 'stores/local-cave-store'
+import { useMapStore } from 'stores/map-store'
 import { ref, computed } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useQuasar } from 'quasar'
@@ -60,6 +61,7 @@ export default {
   setup () {
     const store = useAuthStore()
     const cavesStore = useLocalCavesStore()
+    const mapStore = useMapStore()
     const progress = ref(0.0)
     const { getPageNumber } = storeToRefs(cavesStore)
 
@@ -71,6 +73,7 @@ export default {
       cavesStore,
       progress,
       progressLabel: computed(() => (progress.value * 100).toFixed(2) + '%'),
+      mapStore,
       getPageNumber
     }
   },
@@ -97,7 +100,7 @@ export default {
           rememberMe: true
         }
         const result = await this.store.login(payload)
-
+        await this.fetchMapCapabilities()
         if (result.success) {
           await this.cavesStore.tryFetchCavesForOffline()
           this.$router.replace('/')
@@ -112,6 +115,13 @@ export default {
         })
       } finally {
         this.loggingIn = false
+      }
+    },
+    async fetchMapCapabilities () {
+      for (const layer of this.mapStore.getLayers) {
+        const response = await fetch(layer.url)
+        const capText = await response.text()
+        localStorage.setItem(`cap-${layer.label}`, capText)
       }
     }
   }

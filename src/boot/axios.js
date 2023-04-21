@@ -7,8 +7,9 @@ import axios from 'axios'
 // good idea to move this instance creation inside of the
 // "export default () => {}" function below (which runs individually
 // for each client)
+const apiUrl = 'https://katasterjamcore-dev-as.azurewebsites.net'
 const api = axios.create({
-  baseURL: 'https://katasterjamcore-dev-as.azurewebsites.net/',
+  baseURL: apiUrl,
   headers: {
     'Content-Type': 'application/json'
   }
@@ -26,4 +27,4 @@ export default boot(({ app }) => {
   //       so you can easily perform requests against your app's API
 })
 
-export { api }
+export { api, apiUrl }
