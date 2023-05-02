@@ -131,7 +131,8 @@ export default {
   geology: 'Geology',
   settlement: 'Settlement',
   municipalty: 'Municipality',
-  fetchingData: 'Fetching data',
+  fetchingCaveData: 'Fetching cave data',
+  fetchingCustomLocationData: 'Fetching user locations data',
   lat: 'Latitude',
   lng: 'Longitude',
   clickInfo: 'Click info'

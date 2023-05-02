@@ -7,3 +7,6 @@ export function formatDate (date) {
 
   return ''
 }
+export function getLongDateNow () {
+  return moment(new Date()).format('YYYY-MM-DD HH:mm:ss')
+}

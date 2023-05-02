@@ -4,7 +4,7 @@
       loadTilesWhileAnimating
       loadTilesWhileInteracting
       style="height:100%;"
-      moveTolerance="5"
+      :moveTolerance="5"
       ref="mapRef">
 
       <ol-view
