@@ -1,15 +1,20 @@
 import { api } from 'src/boot/axios'
 import { useLocalCavesStore } from '../stores/local-cave-store'
+import { useOfflineStore } from 'stores/offline-store'
+import { useLocalCustomLocationStore } from '../stores/local-custom-location-store'
 
 const caveResolver = async (to, from, next) => {
-  if (navigator.connection.type && navigator.connection.type === 'none') {
-    const store = useLocalCavesStore()
-    const cave = await store.get(to.params.id)
-    to.meta.cave = cave
-  } else {
+  const store = useLocalCavesStore()
+  const cave = await store.get(to.params.id)
+  to.meta.cave = cave
+  try {
     const response = await api.get(`/api/caves/${to.params.id}`)
     to.meta.cave = response.data
+    await store.put(response.data)
+  } catch (error) {
+    console.log('Could not load caves. Error: ', error)
   }
+
   next()
 }
 const excursionResolver = async (to, from, next) => {
@@ -18,8 +23,23 @@ const excursionResolver = async (to, from, next) => {
   next()
 }
 const customLocationResolver = async (to, from, next) => {
-  const response = await api.get(`/api/customLocations/${to.params.id}`)
-  to.meta.customLocation = response.data
+  const store = useLocalCustomLocationStore()
+  const customLocation = await store.get(to.params.id)
+  to.meta.customLocation = customLocation
+  try {
+    const response = await api.get(`/api/customLocations/${to.params.id}`)
+    to.meta.customLocation = response.data
+    await store.put(response.data)
+  } catch (error) {
+    console.log('Could not load custom locations. Error: ', error)
+  }
+
+  next()
+}
+const offlineRecordResolver = async (to, from, next) => {
+  const store = useOfflineStore()
+  const offlineRecord = await store.get(to.params.id)
+  to.meta.offlineRecord = offlineRecord
   next()
 }
 
@@ -40,7 +60,9 @@ const routes = [
       { path: '/trips', name: 'trips', component: () => import('pages/TripSearchPage.vue') },
       { path: '/trips/details/:id', name: 'trips-details', component: () => import('src/pages/TripDetailsPage.vue'), beforeEnter: excursionResolver },
       { path: '/custom-locations', name: 'custom-locations', component: () => import('pages/CustomLocationSearchPage.vue') },
-      { path: '/custom-locations/details/:id', name: 'custom-locations-details', component: () => import('src/pages/CustomLocationDetailsPage.vue'), beforeEnter: customLocationResolver }
+      { path: '/custom-locations/details/:id', name: 'custom-locations-details', component: () => import('src/pages/CustomLocationDetailsPage.vue'), beforeEnter: customLocationResolver },
+      { path: '/offline-data', name: 'offline-data-list', component: () => import('pages/OfflineDataList.vue') },
+      { path: '/offline-data/:id', name: 'offline-data-page', component: () => import('pages/OfflineDataPage.vue'), beforeEnter: offlineRecordResolver }
     ]
   },
 

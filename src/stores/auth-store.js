@@ -130,6 +130,7 @@ export const useAuthStore = defineStore('auth', {
     clearData () {
       this.user = {}
       this.token = {}
+      localStorage.removeItem('lastImportCustomLocations')
       localStorage.removeItem('user')
       localStorage.removeItem('token')
     }

@@ -8,6 +8,7 @@ import { ref } from 'vue'
 import WMTS, { optionsFromCapabilities } from 'ol/source/WMTS'
 import { WMTSCapabilities } from 'ol/format'
 import { useMapStore } from 'stores/map-store'
+import { db } from 'src/db/db'
 export default {
   props: { layer: Object },
   setup () {
@@ -22,9 +23,8 @@ export default {
   async mounted () {
     const loadLayer = async (layerData, layerRef) => {
       const wmtsParser = new WMTSCapabilities()
-      const response = await fetch(layerData.url)
-      const capText = await response.text()
-      const capabilities = wmtsParser.read(capText)
+      const capabilitiesText = localStorage.getItem(`cap-${layerData.label}`)
+      const capabilities = wmtsParser.read(capabilitiesText)
       const optionsFromCap = optionsFromCapabilities(capabilities, {
         layer: layerData.layerName
       })
@@ -34,10 +34,26 @@ export default {
         attributions: [layerData.attributes],
         crossOrigin: 'anonymous'
       }
-      this.wmtsSource = new WMTS(options)
+      const wmtsSource = new WMTS(options)
+      this.mapStore.setSource(layerData, wmtsSource)
+      wmtsSource.setTileLoadFunction(async (tile, url) => {
+        const image = tile.getImage()
+        const storedTile = await db.tiles.where('tileKey')
+          .equals(url)
+          .first()
+        if (!storedTile) {
+          image.src = url
+          return
+        }
+        const objUrl = URL.createObjectURL(storedTile.image)
+        image.onload = function () {
+          URL.revokeObjectURL(objUrl)
+        }
+        image.src = objUrl
+      })
 
       layerRef.tileLayer.setVisible(this.layer.active)
-      layerRef.tileLayer.setSource(this.wmtsSource)
+      layerRef.tileLayer.setSource(wmtsSource)
     }
     await loadLayer(this.layer, this.layerRef)
   },

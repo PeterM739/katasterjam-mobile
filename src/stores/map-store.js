@@ -13,7 +13,9 @@ export const useMapStore = defineStore('map', {
       layerName: 'TEMELJNE_KARTE_LidarTlaZgradbe_D96',
       projection: 'EPSG:3794',
       attributes: 'Ministrstvo za kulturo, Ministrstvo za okolje in prostor',
-      preview: 'map/skyview.png'
+      preview: 'map/skyview.png',
+      wmtsSource: null,
+      maxZoom: 17
     }, {
       active: false,
       label: 'Ortho',
@@ -21,11 +23,15 @@ export const useMapStore = defineStore('map', {
       layerName: 'TEMELJNE_KARTE_DOF2021',
       projection: 'EPSG:3912',
       attributes: 'Ortophoto podlaga, GURS',
-      preview: 'map/ortophoto.png'
+      preview: 'map/ortophoto.png',
+      wmtsSource: null,
+      maxZoom: 17
     }],
+    wmtsSource: null,
     bottomDrawer: false,
     drawerLoading: false,
-    clickedFeature: {}
+    clickedFeature: {},
+    extent: []
   }),
   getters: {
     getLayers (state) {
@@ -42,9 +48,22 @@ export const useMapStore = defineStore('map', {
     },
     getMap (state) {
       return state.mapRef.map
+    },
+    getExtent (state) {
+      return state.extent
+    },
+    getViewProjection (state) {
+      return state.mapRef.map.getView().getProjection()
     }
   },
   actions: {
+    setSource (layerData, source) {
+      const layer = this.layers.find(l => l.label === layerData.label)
+      layer.wmtsSource = source
+    },
+    updateExtent (extent) {
+      this.extent = extent
+    },
     async mapClick (coordinates, featuresClick) {
       this.bottomDrawer = true
       this.drawerLoading = true

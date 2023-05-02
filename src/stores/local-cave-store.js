@@ -67,6 +67,7 @@ export const useLocalCavesStore = defineStore('caves', {
         })
         await db.caves.bulkPut(caves)
       }
+      this.searchParameters.pageNumber = 0
       this.searchParameters.pageSize = 10
     },
     async searchForCaves () {
@@ -78,7 +79,7 @@ export const useLocalCavesStore = defineStore('caves', {
       let query = db.caves
 
       if (this.searchParameters.query && isNaN(this.searchParameters.query)) {
-        const queryLower = this.searchParameters.query
+        const queryLower = this.searchParameters.query.toLowerCase()
         query = query.filter((item) => {
           return item.name.toLowerCase().indexOf(queryLower) > -1
         })
@@ -116,6 +117,9 @@ export const useLocalCavesStore = defineStore('caves', {
       const cave = await db.caves.where('caveNumber').equals(parseInt(caveNumber)).first()
 
       return cave
+    },
+    async put (cave) {
+      await db.caves.put(cave)
     },
     async searchForNearbyCaves () {
       this.searchParameters.sort = 'distance'

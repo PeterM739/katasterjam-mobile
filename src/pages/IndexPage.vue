@@ -4,7 +4,7 @@
       loadTilesWhileAnimating
       loadTilesWhileInteracting
       style="height:100%;"
-      moveTolerance="5"
+      :moveTolerance="5"
       ref="mapRef">
 
       <ol-view
@@ -29,7 +29,7 @@
     </ol-map>
     <q-page-sticky position="top-right" :offset="[18, 18]">
       <q-fab
-      size="100px"
+        size="100px"
         external-label
         color="purple"
         icon="layers"
@@ -47,9 +47,18 @@
       <q-btn fab :icon="isCenterFixed ? 'my_location' : 'location_searching'" color="accent" @click="myLocationClicked" />
     </q-page-sticky>
     <q-page-sticky position="bottom-right" :offset="[18, 18]">
-      <q-btn fab :icon="trackLocationIcon ? 'stop_circle' : 'play_arrow'" color="accent" @click="trackingClicked" />
+      <q-fab size="100px"
+        vertical-actions-align="right"
+        glossy
+        color="purple"
+        icon="add"
+        direction="up">
+        <q-fab-action :disable="currentZoom < 14" label-position="right" color="primary" @click="storeDataForOffline" icon="wifi_off" label="Offline" />
+        <q-fab-action label-position="right" color="secondary" :icon="trackLocationIcon ? 'stop_circle' : 'play_arrow'"  label="Start track" @click="trackingClicked" />
+      </q-fab>
     </q-page-sticky>
     <DetailsDrawer />
+    <OfflineConfirmDialog />
   </PageFullScreen>
 </template>
 
@@ -63,14 +72,17 @@ import CartoLayers from 'src/components/map/layers/CartoLayers.vue'
 import LocationLayers from 'src/components/map/layers/LocationLayers.vue'
 import CustomLocationLayers from 'src/components/map/layers/CustomLocationLayers.vue'
 import DetailsDrawer from 'src/components/map/drawer/DetailsDrawer.vue'
+import OfflineConfirmDialog from 'src/components/offline/OfflineConfirmDialog.vue'
 import { useLocationStore } from 'stores/location-store'
 import { useMapStore } from 'stores/map-store'
+import { useOfflineStore } from 'stores/offline-store'
 export default defineComponent({
   name: 'IndexPage',
-  components: { PageFullScreen, CartoLayers, LocationLayers, CustomLocationLayers, DetailsDrawer },
+  components: { PageFullScreen, CartoLayers, LocationLayers, CustomLocationLayers, DetailsDrawer, OfflineConfirmDialog },
   setup () {
-    const store = useLocationStore()
+    const locationStore = useLocationStore()
     const mapStore = useMapStore()
+    const offlineStore = useOfflineStore()
     const center = ref([1637531, 5766419])
     const projection = ref('EPSG:3857')
     const zoom = ref(8)
@@ -83,7 +95,7 @@ export default defineComponent({
     mapStore.saveMapRef(mapRef)
 
     return {
-      store,
+      locationStore,
       center,
       projection,
       zoom,
@@ -92,7 +104,8 @@ export default defineComponent({
       markLocations,
       goTo,
       customLocations,
-      mapStore
+      mapStore,
+      offlineStore
     }
   },
   data () {
@@ -115,10 +128,10 @@ export default defineComponent({
   },
   computed: {
     trackLocationIcon () {
-      return this.store.getLocationTracking
+      return this.locationStore.getLocationTracking
     },
     navigationActive () {
-      return this.store.getNavigationActive
+      return this.locationStore.getNavigationActive
     },
     isCenterFixed () {
       return this.fixedCenter
@@ -133,12 +146,13 @@ export default defineComponent({
     },
     zoomChanged (currentZoom) {
       this.currentZoom = currentZoom
+      this.mapStore.updateExtent(this.mapRef.map.getView().calculateExtent())
     },
     trackingClicked (evt) {
-      this.store.toggleLocationTracking()
+      this.locationStore.toggleLocationTracking()
     },
     myLocationClicked (evt) {
-      this.center = this.store.getMyLocationCoordinates
+      this.center = this.locationStore.getMyLocationCoordinates
       this.fixedCenter = true
       this.zoom = this.zoom < 15 ? 15 : this.currentZoom
     },
@@ -158,13 +172,16 @@ export default defineComponent({
     },
     onScreenOrientationChange () {
       this.mapRef.updateSize()
+    },
+    storeDataForOffline () {
+      this.offlineStore.showDialog()
     }
   },
   watch: {
     view (newVal, oldVal) {
-      this.store.initialize(newVal.getProjection())
+      this.locationStore.initialize(newVal.getProjection())
       if (this.goTo) {
-        this.store.startNavigation(this.goTo)
+        this.locationStore.startNavigation(this.goTo)
       }
     }
   },
