@@ -50,6 +50,14 @@
             <q-item-label>{{ $t('customLocations') }}</q-item-label>
           </q-item-section>
         </q-item>
+        <q-item clickable :to="{ name: 'offline-data-list' }">
+          <q-item-section avatar>
+            <q-icon name="wifi_off" />
+          </q-item-section>
+          <q-item-section>
+            <q-item-label>{{ $t('offlinedata') }}</q-item-label>
+          </q-item-section>
+        </q-item>
         <q-item clickable v-ripple @click.once="logOutButton">
           <q-item-section avatar>
             <q-icon name="logout" />
