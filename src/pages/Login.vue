@@ -33,8 +33,8 @@
                 <p class="text-grey-6">{{ $t('register') }}</p>
               </q-card-section>
               <q-card-section class="text-center q-pa-none" v-if="loggingIn">
-                <p class="text-grey-6">{{ $t('fetchingData') }}</p>
-                <q-linear-progress size="50px" :value="progress" color="accent" class="q-mt-sm">
+                <p class="text-grey-6">{{ progressLabelTitle }}</p>
+                <q-linear-progress :instant-feedback="true" size="50px" :value="progress" color="accent" class="q-mt-sm">
 
                   <div class="absolute-full flex flex-center">
                     <q-badge color="white" text-color="accent" :label="progressLabel" />
@@ -53,6 +53,7 @@
 import { useAuthStore } from 'stores/auth-store'
 import { useLocalCavesStore } from 'stores/local-cave-store'
 import { useMapStore } from 'stores/map-store'
+import { useLocalCustomLocationStore } from 'stores/local-custom-location-store'
 import { ref, computed } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useQuasar } from 'quasar'
@@ -62,8 +63,10 @@ export default {
     const store = useAuthStore()
     const cavesStore = useLocalCavesStore()
     const mapStore = useMapStore()
+    const customLocations = useLocalCustomLocationStore()
     const progress = ref(0.0)
     const { getPageNumber } = storeToRefs(cavesStore)
+    const { getPageNumber: customLocationPage } = storeToRefs(customLocations)
 
     const { notify } = useQuasar()
     return {
@@ -74,7 +77,9 @@ export default {
       progress,
       progressLabel: computed(() => (progress.value * 100).toFixed(2) + '%'),
       mapStore,
-      getPageNumber
+      getPageNumber,
+      customLocations,
+      customLocationPage
     }
   },
   data () {
@@ -82,12 +87,16 @@ export default {
       account: {
         email: '',
         password: ''
-      }
+      },
+      progressLabelTitle: this.$t('fetchingCaveData')
     }
   },
   watch: {
     getPageNumber (newValue, oldValue) {
       this.progress = newValue / this.cavesStore.totalPages
+    },
+    customLocationPage (newValue, oldValue) {
+      this.progress = newValue / this.customLocations.getTotalPages
     }
   },
   methods: {
@@ -103,6 +112,9 @@ export default {
         await this.fetchMapCapabilities()
         if (result.success) {
           await this.cavesStore.tryFetchCavesForOffline()
+          this.progress = 0
+          this.progressLabelTitle = this.$t('fetchingCustomLocationData')
+          await this.customLocations.tryFetchCustomLocationsForOffline()
           this.$router.replace('/')
         } else {
           console.error(result.message[0])

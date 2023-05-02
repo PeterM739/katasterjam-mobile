@@ -21,11 +21,11 @@
 <script>
 import { ref } from 'vue'
 import VectorSource from 'ol/source/Vector'
-import { useCustomLocationStore } from 'stores/custom-location-store'
+import { useLocalCustomLocationStore } from 'stores/local-custom-location-store'
 
 export default {
   setup () {
-    const store = useCustomLocationStore()
+    const store = useLocalCustomLocationStore()
     const customLocations = ref([])
     const vectorSource = ref(new VectorSource())
     store.loadForMap().then(() => {

@@ -33,7 +33,7 @@
     <q-separator />
     <q-markup-table>
       <tbody>
-        <tr>
+        <tr v-if="customLocation.organizations">
           <td class="text-left table-row-fit">{{$t('organizations')}}</td>
           <td class="text-left table-row-fit">
             <OrganizationsList :organizations="customLocation.organizations"/>
@@ -43,31 +43,31 @@
           <td class="text-left table-row-fit">{{$t('latLng')}}</td>
           <td class="text-left table-row-fit">{{ customLocation.lat }}, {{ customLocation.lng }}</td>
         </tr>
-        <tr>
+        <tr v-if="customLocation.xgk">
           <td class="text-left table-row-fit">{{$t('GKCoordinates')}}</td>
           <td class="text-left table-row-fit">{{ customLocation.xgk }}, {{ customLocation.ygk }}</td>
         </tr>
-        <tr>
+        <tr v-if="customLocation.type">
           <td class="text-left table-row-fit">{{$t('customLocationType')}}</td>
           <td class="text-left table-row-fit">{{ $t(`customLocationTypes.${customLocation.type}`) }}</td>
         </tr>
-        <tr>
+        <tr v-if="customLocation.status">
           <td class="text-left table-row-fit">{{$t('customLocationStatus')}}</td>
           <td class="text-left table-row-fit">{{ $t(`customLocationStatuses.${customLocation.status}`) }}</td>
         </tr>
-        <tr>
+        <tr v-if="customLocation.elevation">
           <td class="text-left table-row-fit">{{$t('elevation')}}</td>
           <td class="text-left table-row-fit">{{ parseInt(customLocation.elevation) }} {{ $t('elevationAbrv') }}</td>
         </tr>
-        <tr>
+        <tr v-if="customLocation.geology">
           <td class="text-left table-row-fit">{{$t('geology')}}</td>
           <td class="text-left table-row-fit">{{ customLocation.geology }}</td>
         </tr>
-        <tr>
+        <tr v-if="customLocation.settlement">
           <td class="text-left table-row-fit">{{$t('settlement')}}</td>
           <td class="text-left table-row-fit">{{ customLocation.settlement }}</td>
         </tr>
-        <tr>
+        <tr v-if="customLocation.municipalty">
           <td class="text-left table-row-fit">{{$t('municipalty')}}</td>
           <td class="text-left table-row-fit">{{ customLocation.municipalty }}</td>
         </tr>
