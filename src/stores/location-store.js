@@ -51,9 +51,6 @@ export const useLocationStore = defineStore('location', {
   actions: {
     initialize (projection) {
       this.projection = projection
-      if (this.watchId) {
-        navigator.compass.clearWatch(this.watchId)
-      }
       if (this.isCordova) {
         window.BackgroundGeolocation.configure({
           locationProvider: window.BackgroundGeolocation.DISTANCE_FILTER_PROVIDER,
@@ -88,13 +85,18 @@ export const useLocationStore = defineStore('location', {
           this.newLocationUpdate(location)
         })
 
-        this.watchId = navigator.compass.watchHeading((heading) => {
-          this.rotation = heading.magneticHeading
-        }, (compassError) => {
-          alert('Compass error: ' + compassError.code)
-        }, {
-          frequency: 1000
-        })
+        this.initCompass()
+        document.addEventListener('pause', (ev) => {
+          console.log('pause: ', this.watchId)
+
+          if (this.watchId) {
+            navigator.compass.clearWatch(this.watchId)
+          }
+        }, false)
+        document.addEventListener('resume', (ev) => {
+          console.log('resume: ', this.watchId)
+          this.initCompass()
+        }, false)
       }
       navigator.geolocation.watchPosition((position) => {
         if (this.foregroundLocationActivated && position.coords.accuracy > 10 && this.isCordova) {
@@ -172,6 +174,15 @@ export const useLocationStore = defineStore('location', {
     },
     updateNavigation (coords) {
       this.navigateTo = coords.length === 0 ? [] : [this.goTo.getGeometry().getCoordinates(), coords]
+    },
+    initCompass () {
+      this.watchId = navigator.compass.watchHeading((heading) => {
+        this.rotation = heading.magneticHeading
+      }, (compassError) => {
+        alert('Compass error: ' + compassError.code)
+      }, {
+        frequency: 1000
+      })
     }
   }
 })
