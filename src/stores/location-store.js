@@ -90,7 +90,7 @@ export const useLocationStore = defineStore('location', {
         window.BackgroundGeolocation.on('location', (location) => {
           this.newLocationUpdate(location)
         })
-          }
+      }
     },
     newLocationUpdate (location) {
       const coords = fromLonLat([location.longitude, location.latitude])
@@ -144,8 +144,8 @@ export const useLocationStore = defineStore('location', {
             console.log('[INFO] BackgroundGeolocation services enabled', status.locationServicesEnabled)
             console.log('[INFO] BackgroundGeolocation auth status: ' + status.authorization)
             if (!status.isRunning) {
-          window.BackgroundGeolocation.start()
-        }
+              window.BackgroundGeolocation.start()
+            }
           })
         }
         this.foregroundLocationActivated = true
