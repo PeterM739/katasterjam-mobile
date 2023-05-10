@@ -9,6 +9,7 @@ export const useLocationStore = defineStore('location', {
     projection: null,
     rotation: 45,
     watchId: null,
+    locationWatchId: null,
     locationTracking: false,
     navigationActive: false,
     myLocation: {},
@@ -46,6 +47,12 @@ export const useLocationStore = defineStore('location', {
     },
     foregroundNotNeeded (state) {
       return !state.locationTracking && !state.navigationActive
+    },
+    getWatchId (state) {
+      return state.watchId
+    },
+    getLocationWatchId (state) {
+      return state.locationWatchId
     }
   },
   actions: {
@@ -80,34 +87,10 @@ export const useLocationStore = defineStore('location', {
             }, 1000)
           }
         })
-
         window.BackgroundGeolocation.on('location', (location) => {
           this.newLocationUpdate(location)
         })
-
-        this.initCompass()
-        document.addEventListener('pause', (ev) => {
-          console.log('pause: ', this.watchId)
-
-          if (this.watchId) {
-            navigator.compass.clearWatch(this.watchId)
           }
-        }, false)
-        document.addEventListener('resume', (ev) => {
-          console.log('resume: ', this.watchId)
-          this.initCompass()
-        }, false)
-      }
-      navigator.geolocation.watchPosition((position) => {
-        if (this.foregroundLocationActivated && position.coords.accuracy > 10 && this.isCordova) {
-          return
-        }
-        this.newLocationUpdate(position.coords)
-      }, (code, message) => {
-        console.error('Error when trying to fetch location', code, message)
-      }, {
-        enableHighAccuracy: true
-      })
     },
     newLocationUpdate (location) {
       const coords = fromLonLat([location.longitude, location.latitude])
@@ -156,7 +139,14 @@ export const useLocationStore = defineStore('location', {
     startForeground () {
       if (!this.foregroundLocationActivated) {
         if (this.isCordova) {
+          window.BackgroundGeolocation.checkStatus((status) => {
+            console.log('[INFO] BackgroundGeolocation service is running', status.isRunning)
+            console.log('[INFO] BackgroundGeolocation services enabled', status.locationServicesEnabled)
+            console.log('[INFO] BackgroundGeolocation auth status: ' + status.authorization)
+            if (!status.isRunning) {
           window.BackgroundGeolocation.start()
+        }
+          })
         }
         this.foregroundLocationActivated = true
       }
@@ -175,13 +165,23 @@ export const useLocationStore = defineStore('location', {
     updateNavigation (coords) {
       this.navigateTo = coords.length === 0 ? [] : [this.goTo.getGeometry().getCoordinates(), coords]
     },
-    initCompass () {
+    initCompassAndLocation () {
       this.watchId = navigator.compass.watchHeading((heading) => {
         this.rotation = heading.magneticHeading
       }, (compassError) => {
         alert('Compass error: ' + compassError.code)
       }, {
         frequency: 1000
+      })
+      this.locationWatchId = navigator.geolocation.watchPosition((position) => {
+        if (this.foregroundLocationActivated && position.coords.accuracy > 10 && this.isCordova) {
+          return
+        }
+        this.newLocationUpdate(position.coords)
+      }, (code, message) => {
+        console.error('Error when trying to fetch location', code, message)
+      }, {
+        enableHighAccuracy: true
       })
     }
   }
