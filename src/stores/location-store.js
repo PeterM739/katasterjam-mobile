@@ -166,13 +166,17 @@ export const useLocationStore = defineStore('location', {
       this.navigateTo = coords.length === 0 ? [] : [this.goTo.getGeometry().getCoordinates(), coords]
     },
     initCompassAndLocation () {
-      this.watchId = navigator.compass.watchHeading((heading) => {
-        this.rotation = heading.magneticHeading
-      }, (compassError) => {
-        alert('Compass error: ' + compassError.code)
-      }, {
-        frequency: 1000
-      })
+      if ('compass' in navigator) {
+        this.watchId = navigator.compass.watchHeading((heading) => {
+          this.rotation = heading.magneticHeading
+        }, (compassError) => {
+          alert('Compass error: ' + compassError.code)
+        }, {
+          frequency: 1000
+        })
+      } else {
+        console.log('Compass not supported on this device.')
+      }
       this.locationWatchId = navigator.geolocation.watchPosition((position) => {
         if (this.foregroundLocationActivated && position.coords.accuracy > 10 && this.isCordova) {
           return
