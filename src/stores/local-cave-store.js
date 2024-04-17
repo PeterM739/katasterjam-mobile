@@ -163,6 +163,9 @@ export const useLocalCavesStore = defineStore('caves', {
 
       return caves.sort((a, b) => a.distance - b.distance)
         .slice(skip, skip + this.searchParameters.pageSize)
+    },
+    async getAllCaves () {
+      return await db.caves.toArray()
     }
 
   }

@@ -6,25 +6,27 @@
 <script>
 import { ref } from 'vue'
 import WMTS, { optionsFromCapabilities } from 'ol/source/WMTS'
-import { WMTSCapabilities } from 'ol/format'
 import { useMapStore } from 'stores/map-store'
+import { useAuthStore } from 'stores/auth-store'
 import { db } from 'src/db/db'
+import TileState from 'ol/TileState'
 export default {
   props: { layer: Object },
   setup () {
     const mapStore = useMapStore()
+    const authStore = useAuthStore()
     const layerRef = ref(null)
 
     return {
       layerRef,
-      mapStore
+      mapStore,
+      authStore
     }
   },
   async mounted () {
     const loadLayer = async (layerData, layerRef) => {
-      const wmtsParser = new WMTSCapabilities()
       const capabilitiesText = localStorage.getItem(`cap-${layerData.label}`)
-      const capabilities = wmtsParser.read(capabilitiesText)
+      const capabilities = JSON.parse(capabilitiesText.replace(/http:\/\//g, 'https://'))
       const optionsFromCap = optionsFromCapabilities(capabilities, {
         layer: layerData.layerName
       })
@@ -34,15 +36,27 @@ export default {
         attributions: [layerData.attributes],
         crossOrigin: 'anonymous'
       }
-      const wmtsSource = new WMTS(options)
-      this.mapStore.setSource(layerData, wmtsSource)
-      wmtsSource.setTileLoadFunction(async (tile, url) => {
-        const image = tile.getImage()
+      options.tileLoadFunction = async (imageTile, src) => {
+        const image = imageTile.getImage()
         const storedTile = await db.tiles.where('tileKey')
-          .equals(url)
+          .equals(src)
           .first()
         if (!storedTile) {
-          image.src = url
+          const xhr = new XMLHttpRequest()
+          xhr.open('GET', src)
+          xhr.setRequestHeader('Authorization', `Bearer ${this.authStore.getAccessToken}`)
+
+          xhr.onload = function () {
+            if (xhr.status === 200) {
+              const url = URL.createObjectURL(new Blob([xhr.response], { type: 'image/png' }))
+              image.src = url
+            } else {
+              imageTile.setState(TileState.ERROR)
+            }
+          }
+          xhr.responseType = 'arraybuffer'
+          xhr.send()
+
           return
         }
         const objUrl = URL.createObjectURL(storedTile.image)
@@ -50,7 +64,9 @@ export default {
           URL.revokeObjectURL(objUrl)
         }
         image.src = objUrl
-      })
+      }
+      const wmtsSource = new WMTS(options)
+      this.mapStore.setSource(layerData, wmtsSource)
 
       layerRef.tileLayer.setVisible(this.layer.active)
       layerRef.tileLayer.setSource(wmtsSource)
