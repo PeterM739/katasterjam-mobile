@@ -3,7 +3,7 @@
     <ol-source-osm ref="osmSource"/>
   </ol-tile-layer>
   <CustomWMTSLayer v-for="layer in mapStore.getLayers" :key="layer.name" :layer="layer"/>
-  <ol-vector-layer ref="cavesSource"  >
+  <ol-vector-layer ref="cavesSource">
       <ol-style>
         <ol-style-circle :radius="radius">
           <ol-style-fill :color="fill"></ol-style-fill>
