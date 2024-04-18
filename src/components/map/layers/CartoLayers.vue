@@ -22,8 +22,8 @@ import { storeToRefs } from 'pinia'
 import { useMapStore } from 'stores/map-store'
 import CustomWMTSLayer from './CustomWMTSLayer.vue'
 import { MVT } from 'ol/format'
-import TileState from 'ol/TileState'
 import { db } from 'src/db/db'
+import { api } from 'src/boot/axios'
 
 export default {
   components: { CustomWMTSLayer },
@@ -71,19 +71,7 @@ export default {
         .equals(sanitizedUrl)
         .first()
       if (!storedTile) {
-        const xhr = new XMLHttpRequest()
-        xhr.open('GET', url)
-
-        xhr.onload = function () {
-          if (xhr.status === 200) {
-            const url = URL.createObjectURL(new Blob([xhr.response], { type: 'image/png' }))
-            image.src = url
-          } else {
-            tile.setState(TileState.ERROR)
-          }
-        }
-        xhr.responseType = 'arraybuffer'
-        xhr.send()
+        api.getTileImage(tile, url)
 
         return
       }

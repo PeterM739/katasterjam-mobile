@@ -7,20 +7,17 @@
 import { ref } from 'vue'
 import WMTS, { optionsFromCapabilities } from 'ol/source/WMTS'
 import { useMapStore } from 'stores/map-store'
-import { useAuthStore } from 'stores/auth-store'
 import { db } from 'src/db/db'
-import TileState from 'ol/TileState'
+import { api } from 'src/boot/axios'
 export default {
   props: { layer: Object },
   setup () {
     const mapStore = useMapStore()
-    const authStore = useAuthStore()
     const layerRef = ref(null)
 
     return {
       layerRef,
-      mapStore,
-      authStore
+      mapStore
     }
   },
   async mounted () {
@@ -42,20 +39,7 @@ export default {
           .equals(src)
           .first()
         if (!storedTile) {
-          const xhr = new XMLHttpRequest()
-          xhr.open('GET', src)
-          xhr.setRequestHeader('Authorization', `Bearer ${this.authStore.getAccessToken}`)
-
-          xhr.onload = function () {
-            if (xhr.status === 200) {
-              const url = URL.createObjectURL(new Blob([xhr.response], { type: 'image/png' }))
-              image.src = url
-            } else {
-              imageTile.setState(TileState.ERROR)
-            }
-          }
-          xhr.responseType = 'arraybuffer'
-          xhr.send()
+          api.getTileImage(imageTile, src, true)
 
           return
         }

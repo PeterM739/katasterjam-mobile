@@ -1,5 +1,6 @@
 import { boot } from 'quasar/wrappers'
 import axios from 'axios'
+import TileState from 'ol/TileState'
 
 // Be careful when using SSR for cross-request state pollution
 // due to creating a Singleton instance here;
@@ -14,6 +15,20 @@ const api = axios.create({
     'Content-Type': 'application/json'
   }
 })
+api.getTileImage = async function (tile, tileUrl, useAuth = false) {
+  try {
+    const headers = useAuth ? {} : { Authorization: null }
+    const response = await this.get(tileUrl, {
+      responseType: 'arraybuffer',
+      headers
+    })
+    const blob = new Blob([response.data], { type: 'image/png' })
+    const blobUrl = URL.createObjectURL(blob)
+    tile.getImage().src = blobUrl
+  } catch (error) {
+    tile.setState(TileState.ERROR)
+  }
+}
 
 export default boot(({ app }) => {
   // for use inside Vue files (Options API) through this.$axios and this.$api
