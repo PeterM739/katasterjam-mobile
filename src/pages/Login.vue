@@ -109,7 +109,7 @@ export default {
           rememberMe: true
         }
         const result = await this.store.login(payload)
-        await this.fetchMapCapabilities()
+        await this.mapStore.fetchMapCapabilities()
         if (result.success) {
           await this.cavesStore.tryFetchCavesForOffline()
           this.progress = 0
@@ -127,13 +127,6 @@ export default {
         })
       } finally {
         this.loggingIn = false
-      }
-    },
-    async fetchMapCapabilities () {
-      for (const layer of this.mapStore.getLayers) {
-        const response = await fetch(layer.url)
-        const capText = await response.text()
-        localStorage.setItem(`cap-${layer.label}`, capText)
       }
     }
   }

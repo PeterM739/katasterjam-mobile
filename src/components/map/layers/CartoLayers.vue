@@ -3,9 +3,17 @@
     <ol-source-osm ref="osmSource"/>
   </ol-tile-layer>
   <CustomWMTSLayer v-for="layer in mapStore.getLayers" :key="layer.name" :layer="layer"/>
-  <ol-tile-layer>
-    <ol-source-xyz ref="cavesSource" url="https://services7.arcgis.com/V2VriwTjJDabpGg6/ArcGIS/rest/services/2022_marec_export_ekataster_tile_layer/MapServer/WMTS/tile/1.0.0/2022_marec_export_ekataster_tile_layer/default/default028mm/{z}/{y}/{x}.png"/>
-  </ol-tile-layer>
+  <ol-vector-layer ref="cavesSource">
+      <ol-style>
+        <ol-style-circle :radius="radius">
+          <ol-style-fill :color="fill"></ol-style-fill>
+          <ol-style-stroke
+            :color="stroke"
+            :width="strokeWidth"
+          ></ol-style-stroke>
+        </ol-style-circle>
+      </ol-style>
+    </ol-vector-layer>
 </template>
 
 <script>
@@ -13,7 +21,9 @@ import { ref } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useMapStore } from 'stores/map-store'
 import CustomWMTSLayer from './CustomWMTSLayer.vue'
+import { MVT } from 'ol/format'
 import { db } from 'src/db/db'
+import { api } from 'src/boot/axios'
 
 export default {
   components: { CustomWMTSLayer },
@@ -23,8 +33,14 @@ export default {
     const orthoPhotoLayer = ref(null)
     const cavesSource = ref(null)
     const osmSource = ref(null)
-    const { isSkyViewActive, isOrthoPhotoActive, getOrthoPhoto } = storeToRefs(mapStore)
+    const mvtFormat = new MVT()
+    const radius = ref(5)
+    const strokeWidth = ref(0.5)
+    const stroke = ref('black')
+    const fill = ref('rgba(255, 50, 28, 0.6)')
+    const highlightedFeatures = ref([])
 
+    const { isSkyViewActive, isOrthoPhotoActive, getOrthoPhoto } = storeToRefs(mapStore)
     return {
       skyViewLayer,
       orthoPhotoLayer,
@@ -33,32 +49,40 @@ export default {
       mapStore,
       getOrthoPhoto,
       osmSource,
-      cavesSource
+      cavesSource,
+      mvtFormat,
+      radius,
+      strokeWidth,
+      stroke,
+      fill,
+      highlightedFeatures
     }
   },
   watch: {
-    isSkyViewActive (newValue, oldValue) {
+    isSkyViewActive (newValue, _oldValue) {
       this.skyViewLayer.tileLayer.setVisible(newValue)
     }
   },
   async mounted () {
-    [this.cavesSource, this.osmSource].map(src => {
-      return src.source.setTileLoadFunction(async (tile, url) => {
-        const image = tile.getImage()
-        const sanitizedUrl = url.replace(/^(https?:\/\/)[abc]\./, '$1')
-        const storedTile = await db.tiles.where('tileKey')
-          .equals(sanitizedUrl)
-          .first()
-        if (!storedTile) {
-          image.src = url
-          return
-        }
-        const objUrl = URL.createObjectURL(storedTile.image)
-        image.onload = function () {
-          URL.revokeObjectURL(objUrl)
-        }
-        image.src = objUrl
-      })
+    this.osmSource.source?.setTileLoadFunction(async (tile, url) => {
+      const image = tile.getImage()
+      const sanitizedUrl = url.replace(/^(https?:\/\/)[abc]\./, '$1')
+      const storedTile = await db.tiles.where('tileKey')
+        .equals(sanitizedUrl)
+        .first()
+      if (!storedTile) {
+        api.getTileImage(tile, url)
+
+        return
+      }
+      const objUrl = URL.createObjectURL(storedTile.image)
+      image.onload = function () {
+        URL.revokeObjectURL(objUrl)
+      }
+      image.src = objUrl
+    })
+    this.mapStore.getCavesLayerSource().then(source => {
+      this.cavesSource.vectorLayer.setSource(source)
     })
   }
 }
