@@ -38,6 +38,7 @@ export const useMapStore = defineStore('map', {
     bottomDrawer: false,
     drawerLoading: false,
     clickedFeature: {},
+    clickLocation: [],
     extent: [],
     cavesSourceInstance: null
   }),
@@ -75,6 +76,7 @@ export const useMapStore = defineStore('map', {
     async mapClick (coordinates, featuresClick) {
       this.bottomDrawer = true
       this.drawerLoading = true
+      this.clickLocation = coordinates
       try {
         const lngLat = olProj.toLonLat(coordinates)
         this.clickedFeature = {

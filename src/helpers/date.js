@@ -13,3 +13,6 @@ export function getDateTime () {
 export function getLongDateNow () {
   return moment(new Date()).format('YYYY-MM-DD HH:mm:ss')
 }
+export function getDBDateNow () {
+  return moment(new Date()).format('YYYY-MM-DDTHH:mm:ss.SSS')
+}

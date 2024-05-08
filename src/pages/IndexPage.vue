@@ -13,9 +13,8 @@
         :center="center"
         :zoom="zoom"
         :projection="projection"
-        @zoomChanged="zoomChanged"
-        @centerChanged="centerChanged"
-        @resolutionChanged="resolutionChanged"/>
+        @change:center="centerChanged"
+        @change:resolution="resolutionChanged"/>
       <CartoLayers/>
       <LocationLayers
         :view="view"
@@ -156,10 +155,15 @@ export default defineComponent({
       this.fixedCenter = true
       this.zoom = this.zoom < 15 ? 15 : this.currentZoom
     },
-    resolutionChanged (resolution) {
-      this.currentResolution = resolution
+    resolutionChanged (event) {
+      this.currentResolution = event.target.getResolution()
+      this.zoomChanged(event.target.getZoom())
     },
-    centerChanged (center) {
+    centerChanged (event) {
+      if (!event.target) {
+        return
+      }
+      const center = event.target.getCenter()
       if (this.view === '') {
         return
       }

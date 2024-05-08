@@ -34,6 +34,12 @@ export const useLocalCustomLocationStore = defineStore('local-custom-locations',
     getCustomLocations (state) {
       return state.customLocations
     },
+    getCustomLocationsTypes (state) {
+      return db.customLocationsTypes.toArray()
+    },
+    getCustomLocationsStatuses (state) {
+      return db.customLocationsStatuses.toArray()
+    },
     getTotalPages (state) {
       return state.totalPages
     },
@@ -60,11 +66,7 @@ export const useLocalCustomLocationStore = defineStore('local-custom-locations',
       this.searchParameters.pageNumber++
     },
     loadCustomLocations (customLocations) {
-      if (this.searchParameters.pageNumber > 1) {
-        customLocations.map(customLocation => this.customLocations.push(customLocation))
-      } else {
-        this.customLocations = customLocations
-      }
+      this.customLocations = customLocations
     },
     async get (id) {
       const result = await db.customLocations.where('id').equals(parseInt(id)).first()
@@ -77,30 +79,53 @@ export const useLocalCustomLocationStore = defineStore('local-custom-locations',
     async tryFetchCustomLocationsForOffline () {
       this.searchParameters.lastUpdated = localStorage.getItem('lastImportCustomLocations')
       const dateNow = getLongDateNow()
+      const searchParameters = {
+        ...this.searchParameters,
+        pageNumber: 0,
+        pageSize: 500
+      }
 
-      this.totalPages = 1
-      this.searchParameters.pageSize = 500
-      this.searchParameters.pageNumber = 0
+      let allPages = 1
       try {
-        while (this.searchParameters.pageNumber < this.totalPages) {
-          this.searchParameters.pageNumber += 1
+        while (searchParameters.pageNumber < allPages) {
+          searchParameters.pageNumber += 1
           const response = await api.get('/api/customlocations', {
-            params: this.searchParameters
+            params: searchParameters
           })
 
           const pagination = JSON.parse(response.headers.pagination)
-          this.totalPages = pagination.totalPages
+          allPages = pagination.totalPages
           const customLocations = response.data
 
-          await db.customLocations.bulkPut(customLocations)
+          if (customLocations.length > 0) {
+            await db.customLocations.bulkPut(customLocations)
+            await this.search()
+          }
         }
 
         localStorage.setItem('lastImportCustomLocations', dateNow)
       } catch (error) {
         console.error('Error occured while searching for new custom locations')
-      } finally {
-        this.searchParameters.pageSize = 10
-        this.searchParameters.pageNumber = 1
+      }
+    },
+    async fetchCustomLocationsTypes () {
+      try {
+        const response = await api.get('/api/customlocations/types', {
+          params: this.searchParameters
+        })
+        await db.customLocationsTypes.bulkPut(response.data)
+      } catch (error) {
+        console.error('Error occured while searching for new custom location types')
+      }
+    },
+    async fetchCustomLocationsStatuses () {
+      try {
+        const response = await api.get('/api/customlocations/statuses', {
+          params: this.searchParameters
+        })
+        await db.customLocationsStatuses.bulkPut(response.data)
+      } catch (error) {
+        console.error('Error occured while searching for new custom location statuses')
       }
     },
     async search () {
@@ -109,7 +134,7 @@ export const useLocalCustomLocationStore = defineStore('local-custom-locations',
         return
       }
 
-      let query = db.customLocations.orderBy('id').reverse()
+      let query = db.customLocations.orderBy('createdDate').reverse()
 
       if (this.searchParameters.query && isNaN(this.searchParameters.query)) {
         const queryLower = this.searchParameters.query.toLowerCase()
@@ -123,8 +148,8 @@ export const useLocalCustomLocationStore = defineStore('local-custom-locations',
       }
 
       this.totalPages = Math.ceil(await query.count() / this.searchParameters.pageSize)
-      const queryWithOffset = query.offset((this.searchParameters.pageNumber - 1) * this.searchParameters.pageSize)
-        .limit(this.searchParameters.pageSize)
+      const queryWithOffset = query
+        .limit((this.searchParameters.pageNumber) * this.searchParameters.pageSize)
         .toArray()
 
       const localCustomLocations = await queryWithOffset

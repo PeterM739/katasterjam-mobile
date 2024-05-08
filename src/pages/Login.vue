@@ -115,6 +115,10 @@ export default {
           this.progress = 0
           this.progressLabelTitle = this.$t('fetchingCustomLocationData')
           await this.customLocations.tryFetchCustomLocationsForOffline()
+          this.progressLabelTitle = this.$t('fetchingCustomLocationTypes')
+          await this.customLocations.fetchCustomLocationsTypes()
+          this.progressLabelTitle = this.$t('fetchingCustomLocationStatuses')
+          await this.customLocations.fetchCustomLocationsStatuses()
           this.$router.replace('/')
         } else {
           console.error(result.message[0])
