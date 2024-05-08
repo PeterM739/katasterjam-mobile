@@ -62,14 +62,16 @@ export default {
   setup () {
     const { dialog } = useQuasar()
     const store = useLocalCustomLocationStore()
-    store.tryFetchCustomLocationsForOffline().then(() => {
-      console.log('Custom location list updated')
-    })
-    if (store.getCustomLocations.length === 0) {
-      store.search().then(() => {
-        console.log('custom locations loaded')
+    store.uploadNew().then(() => {
+      console.log('Possible offline data uploaded')
+      store.tryFetchCustomLocationsForOffline().then(() => {
+        console.log('Custom location list updated')
       })
-    }
+    })
+    store.search().then(() => {
+      console.log('custom locations loaded')
+    })
+
     const query = ref(store.getQuery)
     const selectedCustomLocation = ref(null)
     const confirmRef = ref(null)

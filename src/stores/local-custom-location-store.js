@@ -5,6 +5,7 @@ import * as olProj from 'ol/proj'
 import { api } from 'src/boot/axios'
 import { db } from 'src/db/db'
 import { getLongDateNow } from 'src/helpers/date'
+import { useAuthStore } from 'src/stores/auth-store'
 
 import iconNewCave from '../assets/map/markers/x_yellow.png'
 import iconBlowHole from '../assets/map/markers/x_purple.png'
@@ -76,6 +77,18 @@ export const useLocalCustomLocationStore = defineStore('local-custom-locations',
     async put (customLocation) {
       await db.customLocations.put(customLocation)
     },
+    async add (customLocation) {
+      const authStore = useAuthStore()
+      if (customLocation.organizations?.length === 0) {
+        customLocation.organizations = [{
+          id: authStore.getOrganizationId
+        }]
+      }
+
+      const result = await db.customLocations.add(customLocation)
+
+      return result
+    },
     async tryFetchCustomLocationsForOffline () {
       this.searchParameters.lastUpdated = localStorage.getItem('lastImportCustomLocations')
       const dateNow = getLongDateNow()
@@ -133,7 +146,6 @@ export const useLocalCustomLocationStore = defineStore('local-custom-locations',
         await this.searchForNearby()
         return
       }
-
       let query = db.customLocations.orderBy('createdDate').reverse()
 
       if (this.searchParameters.query && isNaN(this.searchParameters.query)) {
@@ -203,6 +215,30 @@ export const useLocalCustomLocationStore = defineStore('local-custom-locations',
       })
 
       return this.customLocationsForMap
+    },
+    async uploadNew () {
+      const authStore = useAuthStore()
+
+      const localLocations = await db.customLocations
+        .where('id')
+        .equals(-1)
+        .toArray()
+      for (const localLocation of localLocations) {
+        const newLocation = {
+          ...localLocation,
+          users: [{
+            id: authStore.getUser.id
+          }],
+          locationStatusId: localLocation.statusId,
+          locationTypeId: localLocation.typeId
+        }
+        try {
+          const response = await api.post('/api/customlocations', newLocation)
+          await db.customLocations.put(response.data)
+        } catch (error) {
+          console.error('Error while uploading new location', error)
+        }
+      }
     }
   }
 })

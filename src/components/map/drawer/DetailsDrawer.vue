@@ -24,6 +24,7 @@
             </div>
             <q-space />
             <q-btn flat round icon="info" v-if="clickedFeature.type !== 'click'" @click="info(clickedFeature.id)"/>
+            <q-btn flat round icon="add" v-if="clickedFeature.type == 'click'" @click="addNewLocation()"/>
             <q-btn flat round icon="assist_walker"  @click="goTo()"/>
           </q-card-section>
         </template>
@@ -88,6 +89,9 @@ export default {
         name: this.clickedFeature.type === 'cave' ? 'caves-details' : 'custom-locations-details',
         params: { id }
       })
+    },
+    addNewLocation () {
+      this.locationStore.createNew([this.clickedFeature.lng, this.clickedFeature.lat])
     }
   },
   watch: {

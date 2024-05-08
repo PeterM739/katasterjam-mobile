@@ -165,5 +165,14 @@ export default {
   osm: 'Open street map',
   lidar: 'Lidar SkyView',
   ortophoto: 'Ortho photo',
-  cavesLayer: 'Cave dots'
+  cavesLayer: 'Cave dots',
+  fetchingCustomLocationStatuses: 'Fetching custom location statuses',
+  fetchingCustomLocationTypes: 'Fetching custom location types',
+  customLocationName: 'Location name',
+  customLocationDescription: 'Location description',
+  locationNameHint: 'My location 123',
+  excursion: 'Excursion',
+  required: 'Required',
+  submit: 'Submit',
+  noResults: 'No results'
 }

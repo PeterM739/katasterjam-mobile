@@ -58,6 +58,7 @@
     </q-page-sticky>
     <DetailsDrawer />
     <OfflineConfirmDialog />
+    <AddLocation />
   </PageFullScreen>
 </template>
 
@@ -72,12 +73,13 @@ import LocationLayers from 'src/components/map/layers/LocationLayers.vue'
 import CustomLocationLayers from 'src/components/map/layers/CustomLocationLayers.vue'
 import DetailsDrawer from 'src/components/map/drawer/DetailsDrawer.vue'
 import OfflineConfirmDialog from 'src/components/offline/OfflineConfirmDialog.vue'
+import AddLocation from 'src/components/custom-locations/AddLocation.vue'
 import { useLocationStore } from 'stores/location-store'
 import { useMapStore } from 'stores/map-store'
 import { useOfflineStore } from 'stores/offline-store'
 export default defineComponent({
   name: 'IndexPage',
-  components: { PageFullScreen, CartoLayers, LocationLayers, CustomLocationLayers, DetailsDrawer, OfflineConfirmDialog },
+  components: { PageFullScreen, CartoLayers, LocationLayers, CustomLocationLayers, DetailsDrawer, OfflineConfirmDialog, AddLocation },
   setup () {
     const locationStore = useLocationStore()
     const mapStore = useMapStore()

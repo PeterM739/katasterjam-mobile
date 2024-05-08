@@ -166,5 +166,14 @@ export default {
   osm: 'Open street map',
   lidar: 'Lidar SkyView',
   ortophoto: 'Orto foto',
-  cavesLayer: 'Pike jam'
+  cavesLayer: 'Pike jam',
+  fetchingCustomLocationStatuses: 'Pridobivanje statusov točk uporabnikov',
+  fetchingCustomLocationTypes: 'Pridoivanje tipov točk uporabnikov',
+  customLocationName: 'Ime točke',
+  customLocationDescription: 'Opis točke',
+  locationNameHint: 'Moja točka 123',
+  excursion: 'Ekskurzija',
+  required: 'Obvezno',
+  submit: 'Pošlji',
+  noResults: 'Ni rezultatov'
 }
