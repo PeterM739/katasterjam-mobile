@@ -112,32 +112,7 @@ export default {
       selectedStatus: ref(null),
       statusOptions,
       selectedExcursion: ref(null),
-      excursionOptions,
-      filterFn (val, update, abort) {
-        setTimeout(() => {
-          update(
-            async () => {
-              excursionStore.addQueryParameter(val.toLowerCase())
-              await excursionStore.searchForExcursions()
-              excursionOptions.value = excursionStore.getExcursions.map(e => {
-                return {
-                  label: e.name,
-                  value: e.id
-                }
-              })
-            },
-            ref => {
-              if (val !== '' && ref.options.length > 0) {
-                ref.setOptionIndex(-1)
-                ref.moveOptionSelection(1, true)
-              }
-            }
-          )
-        }, 300)
-      },
-      abortFilterFn () {
-        console.log('delayed filter aborted')
-      }
+      excursionOptions
     }
   },
   computed: {
@@ -172,6 +147,31 @@ export default {
       this.selectedType = null
       this.filesImages = []
       this.images = []
+    },
+    filterFn (val, update, abort) {
+      setTimeout(() => {
+        update(
+          async () => {
+            this.excursionStore.addQueryParameter(val.toLowerCase())
+            await this.excursionStore.searchForExcursions()
+            this.excursionOptions = this.excursionStore.getExcursions.map(e => {
+              return {
+                label: e.name,
+                value: e.id
+              }
+            })
+          },
+          ref => {
+            if (val !== '' && ref.options.length > 0) {
+              ref.setOptionIndex(-1)
+              ref.moveOptionSelection(1, true)
+            }
+          }
+        )
+      }, 300)
+    },
+    abortFilterFn () {
+      console.log('delayed filter aborted')
     }
   },
   watch: {
