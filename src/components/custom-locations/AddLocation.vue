@@ -12,25 +12,21 @@
           :label="$t('customLocationName')"
           :hint="$t('locationNameHint')"
           lazy-rules
-          :rules="[ val => val && val.length > 0 || $t('required')]"
+          :rules="[ inputValidator ]"
         />
         <q-input
           filled
           v-model="description"
           :label="$t('customLocationDescription')"
           lazy-rules
-          :rules="[ val => val && val.length > 0 || $t('required')]"
+          :rules="[ inputValidator ]"
         />
         <q-select v-model="selectedType" :options="typeOptions" :label="$t('customLocationType')"
           lazy-rules
-          :rules="[
-            val => !!val || $t('required'),
-          ]"/>
+          :rules="[dropDownValidator]"/>
         <q-select v-model="selectedStatus" :options="statusOptions" :label="$t('customLocationStatus')"
           lazy-rules
-          :rules="[
-            val => !!val || $t('required'),
-          ]"/>
+          :rules="[dropDownValidator]"/>
         <q-select
         filled
         v-model="selectedExcursion"
@@ -172,6 +168,12 @@ export default {
     },
     abortFilterFn () {
       console.log('delayed filter aborted')
+    },
+    inputValidator (val) {
+      return (val && val.length > 0) || this.$t('required')
+    },
+    dropDownValidator (val) {
+      return val || this.$t('required')
     }
   },
   watch: {
