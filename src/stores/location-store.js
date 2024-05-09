@@ -14,7 +14,8 @@ export const useLocationStore = defineStore('location', {
     navigationActive: false,
     myLocation: {},
     myTrack: [],
-    navigateTo: []
+    navigateTo: [],
+    addLocation: []
   }),
 
   getters: {
@@ -47,6 +48,9 @@ export const useLocationStore = defineStore('location', {
     },
     foregroundNotNeeded (state) {
       return !state.locationTracking && !state.navigationActive
+    },
+    getAddLocation (state) {
+      return state.addLocation
     },
     getWatchId (state) {
       return state.watchId
@@ -187,6 +191,9 @@ export const useLocationStore = defineStore('location', {
       }, {
         enableHighAccuracy: true
       })
+    },
+    createNew (location) {
+      this.addLocation = location
     }
   }
 })
