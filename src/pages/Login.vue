@@ -54,6 +54,7 @@ import { useAuthStore } from 'stores/auth-store'
 import { useLocalCavesStore } from 'stores/local-cave-store'
 import { useMapStore } from 'stores/map-store'
 import { useLocalCustomLocationStore } from 'stores/local-custom-location-store'
+import { useLocalExcursionsStore } from 'stores/local-excursion-store'
 import { ref, computed } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useQuasar } from 'quasar'
@@ -67,6 +68,8 @@ export default {
     const progress = ref(0.0)
     const { getPageNumber } = storeToRefs(cavesStore)
     const { getPageNumber: customLocationPage } = storeToRefs(customLocations)
+    const excursionsStore = useLocalExcursionsStore()
+    const { getPageNumber: excursionsPage } = storeToRefs(excursionsStore)
 
     const { notify } = useQuasar()
     return {
@@ -74,12 +77,14 @@ export default {
       loggingIn: ref(false),
       store,
       cavesStore,
+      excursionsStore,
       progress,
       progressLabel: computed(() => (progress.value * 100).toFixed(2) + '%'),
       mapStore,
       getPageNumber,
       customLocations,
-      customLocationPage
+      customLocationPage,
+      excursionsPage
     }
   },
   data () {
@@ -97,6 +102,9 @@ export default {
     },
     customLocationPage (newValue, oldValue) {
       this.progress = newValue / this.customLocations.getTotalPages
+    },
+    excursionsPage (newValue, oldValue) {
+      this.progress = newValue / this.excursionsStore.getTotalPages
     }
   },
   methods: {
@@ -119,6 +127,10 @@ export default {
           await this.customLocations.fetchCustomLocationsTypes()
           this.progressLabelTitle = this.$t('fetchingCustomLocationStatuses')
           await this.customLocations.fetchCustomLocationsStatuses()
+
+          this.progress = 0
+          this.progressLabelTitle = this.$t('fetchingExcursionsData')
+          await this.excursionsStore.tryFetchExcursionsForOffline()
           this.$router.replace('/')
         } else {
           console.error(result.message[0])

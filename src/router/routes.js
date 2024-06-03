@@ -2,6 +2,7 @@ import { api } from 'src/boot/axios'
 import { useLocalCavesStore } from '../stores/local-cave-store'
 import { useOfflineStore } from 'stores/offline-store'
 import { useLocalCustomLocationStore } from '../stores/local-custom-location-store'
+import { useLocalExcursionsStore } from '../stores/local-excursion-store'
 
 const caveResolver = async (to, from, next) => {
   const store = useLocalCavesStore()
@@ -18,8 +19,17 @@ const caveResolver = async (to, from, next) => {
   next()
 }
 const excursionResolver = async (to, from, next) => {
-  const response = await api.get(`/api/excursions/${to.params.id}`)
-  to.meta.excursion = response.data
+  const store = useLocalExcursionsStore()
+  const excursion = await store.get(to.params.id)
+  to.meta.excursion = excursion
+  try {
+    const response = await api.get(`/api/excursions/${to.params.id}`)
+    to.meta.excursion = response.data
+    await store.put(response.data)
+  } catch (error) {
+    console.log('Could not load excursion. Error: ', error)
+  }
+
   next()
 }
 const customLocationResolver = async (to, from, next) => {

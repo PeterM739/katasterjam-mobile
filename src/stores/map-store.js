@@ -99,7 +99,7 @@ export const useMapStore = defineStore('map', {
               id: cave.caveNumber,
               name: cave.name,
               lat: cave.lat,
-              lng: cave.lon,
+              lng: cave.lng,
               length: cave.length,
               depth: cave.depth,
               type: 'cave'
