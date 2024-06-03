@@ -64,12 +64,12 @@ import { storeToRefs } from 'pinia'
 import { v4 as uuidv4 } from 'uuid'
 import { getDBDateNow } from 'src/helpers/date'
 import { useLocationStore } from 'stores/location-store'
-import { useExcursionsStore } from 'stores/excursion-store'
+import { useLocalExcursionsStore } from 'stores/local-excursion-store'
 import { useLocalCustomLocationStore } from 'stores/local-custom-location-store'
 export default {
   setup () {
     const locationStore = useLocationStore()
-    const excursionStore = useExcursionsStore()
+    const excursionStore = useLocalExcursionsStore()
     const localCustomLocationStore = useLocalCustomLocationStore()
     const dialog = ref(false)
     const name = ref(null)
@@ -149,13 +149,14 @@ export default {
         update(
           async () => {
             this.excursionStore.addQueryParameter(val.toLowerCase())
-            await this.excursionStore.searchForExcursions()
+            await this.excursionStore.search()
             this.excursionOptions = this.excursionStore.getExcursions.map(e => {
               return {
                 label: e.name,
                 value: e.id
               }
             })
+            this.excursionStore.addQueryParameter()
           },
           ref => {
             if (val !== '' && ref.options.length > 0) {

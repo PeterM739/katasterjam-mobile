@@ -175,5 +175,6 @@ export default {
   excursion: 'Ekskurzija',
   required: 'Obvezno',
   submit: 'Pošlji',
-  noResults: 'Ni rezultatov'
+  noResults: 'Ni rezultatov',
+  fetchingExcursionsData: 'Pridobivanje podatkov o ekskurzijah'
 }

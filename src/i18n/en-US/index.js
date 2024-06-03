@@ -174,5 +174,6 @@ export default {
   excursion: 'Excursion',
   required: 'Required',
   submit: 'Submit',
-  noResults: 'No results'
+  noResults: 'No results',
+  fetchingExcursionsData: 'Fetching excursions data'
 }

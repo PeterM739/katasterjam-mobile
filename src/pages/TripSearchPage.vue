@@ -57,21 +57,21 @@
 <script>
 import { useQuasar } from 'quasar'
 import { ref } from 'vue'
-import { useExcursionsStore } from 'stores/excursion-store'
+import { useLocalExcursionsStore } from 'stores/local-excursion-store'
 import { formatDate } from 'src/helpers/date'
 export default {
   name: 'ExcursionSearchPage',
   setup () {
     const { dialog } = useQuasar()
-    const store = useExcursionsStore()
+    const store = useLocalExcursionsStore()
     const query = ref(store.getQuery)
     const mine = ref(false)
-
-    if (store.getExcursions.length === 0) {
-      store.searchForExcursions().then(() => {
-        console.log('excursions loaded')
-      })
-    }
+    store.tryFetchExcursionsForOffline().then(() => {
+      console.log('Excursion list updated')
+    })
+    store.search().then(() => {
+      console.log('excursions loaded')
+    })
 
     return {
       confirmDialog: dialog,
@@ -126,18 +126,18 @@ export default {
     },
     async onlyMine () {
       this.store.onlyMyExcursions(this.mine = !this.mine)
-      await this.store.searchForExcursions()
+      await this.store.search()
     },
     async executeSearch () {
       this.store.addQueryParameter(this.query)
-      await this.store.searchForExcursions()
+      await this.store.search()
     },
     async loadMore () {
       this.store.incrementPageNumber()
-      await this.store.searchForExcursions()
+      await this.store.search()
     },
     async refresh (done) {
-      await this.store.searchForExcursions()
+      await this.store.search()
       done()
     }
   }
