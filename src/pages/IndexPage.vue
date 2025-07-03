@@ -26,7 +26,7 @@
       </ol-vector-layer>
       <q-resize-observer @resize="onScreenOrientationChange" />
     </ol-map>
-    <q-page-sticky position="top-right" :offset="[18, 18]">
+    <q-page-sticky position="top-right" :offset="navigationActive ? [18, 80] : [18, 18]">
       <q-fab
         size="100px"
         external-label
@@ -52,7 +52,9 @@
         color="purple"
         icon="add"
         direction="up">
-        <q-fab-action :disable="currentZoom < 14" label-position="right" color="primary" @click="storeDataForOffline" icon="wifi_off" label="Offline" />
+        <q-fab-action :disable="currentZoom < 14" label-position="right" color="primary" @click="storeDataForOffline" icon="wifi_off" label="Offline">
+          <q-tooltip v-if="currentZoom < 14" anchor="top left" self="center middle">Zoom in to enable offline mode</q-tooltip>
+        </q-fab-action>
         <q-fab-action label-position="right" color="secondary" :icon="trackLocationIcon ? 'stop_circle' : 'play_arrow'"  label="Start track" @click="trackingClicked" />
       </q-fab>
     </q-page-sticky>
