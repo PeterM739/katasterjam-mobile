@@ -33,7 +33,6 @@
         "ACCOUNT_TYPE": "$PACKAGE_NAME.account",
         "CONTENT_AUTHORITY": "$PACKAGE_NAME"
       },
-      "cordova-plugin-device-orientation": {},
       "cordova-plugin-geolocation": {
         "GPS_REQUIRED": "true"
       }
