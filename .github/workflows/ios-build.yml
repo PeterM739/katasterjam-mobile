@@ -21,14 +21,14 @@ jobs:
           npm install -g cordova
           npm install
 
+      - name: Build Quasar App
+        run: |
+          npm run build -- -m cordova -T ios
+
       - name: Add Cordova iOS platform (if not committed)
         run: |
           cd src-cordova
           cordova platform add ios
-
-      - name: Build Quasar App
-        run: |
-          npm run build -- -m cordova -T ios
 
       - name: Install CocoaPods (iOS dependencies)
         run: |
