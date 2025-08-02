@@ -9,4 +9,5 @@
     <allow-intent href="http://*/*" />
     <allow-intent href="https://*/*" />
     <allow-navigation href="about:*" />
+    <preference name="deployment-target" value="12.0" />
 </widget>
