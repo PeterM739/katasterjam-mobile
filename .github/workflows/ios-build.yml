@@ -1,7 +1,7 @@
-name: Build iOS App (Cordova)
+name: Build iOS Cordova App
 
 on:
-  workflow_dispatch: # Manual trigger
+  workflow_dispatch: # Manual trigger from GitHub UI
 
 jobs:
   build-ios:
@@ -16,7 +16,7 @@ jobs:
         with:
           node-version: 18
 
-      - name: Install dependencies
+      - name: Install Cordova and dependencies
         run: |
           npm install -g cordova
           npm install
@@ -30,19 +30,18 @@ jobs:
           cd src-cordova
           cordova platform add ios
 
-      - name: Install CocoaPods (for native iOS deps)
+      - name: Install CocoaPods (iOS dependencies)
         run: |
           cd src-cordova/platforms/ios
           pod install
 
-      - name: Build iOS App with Cordova
+      - name: Build iOS App (unsigned IPA)
         run: |
           cd src-cordova
           cordova build ios --device --release
-          
-      - name: Upload IPA (unsigned)
+
+      - name: Upload unsigned IPA as artifact
         uses: actions/upload-artifact@v4
         with:
-          name: ios-ipa
-          path: |
-            src-cordova/platforms/ios/build/device/*.ipa
+          name: ios-ipa-unsigned
+          path: src-cordova/platforms/ios/build/device/*.ipa
