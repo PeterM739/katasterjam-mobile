@@ -11,7 +11,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Setup Node
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 18
@@ -21,31 +21,38 @@ jobs:
           npm install -g cordova
           npm install
 
-      - name: Build Quasar App
+      - name: Build Quasar App (creates src-cordova)
         run: |
-          npm run build -- -m cordova -T ios
+          npx quasar build -m cordova -T ios
 
-      - name: Add Cordova iOS platform (if not committed)
+      - name: Add Cordova iOS platform
         run: |
           cd src-cordova
-          cordova platform add ios
+          cordova platform add ios || true
 
-      - name: Install CocoaPods (iOS dependencies)
+      - name: Patch iOS deployment targets to 12.0
+        run: |
+          # Patch app project
+          sed -i '' 's/IPHONEOS_DEPLOYMENT_TARGET = 11.0;/IPHONEOS_DEPLOYMENT_TARGET = 12.0;/g' src-cordova/platforms/ios/*.xcodeproj/project.pbxproj
+          # Patch CordovaLib
+          sed -i '' 's/IPHONEOS_DEPLOYMENT_TARGET = 11.0;/IPHONEOS_DEPLOYMENT_TARGET = 12.0;/g' src-cordova/platforms/ios/CordovaLib/CordovaLib.xcodeproj/project.pbxproj
+
+      - name: Install CocoaPods dependencies
         run: |
           cd src-cordova/platforms/ios
           pod install
 
-      - name: Build iOS App (unsigned IPA)
+      - name: Build iOS app (unsigned IPA)
         run: |
           cd src-cordova
           cordova build ios --device --release
         continue-on-error: true
 
-      - name: List .ipa files (debug step)
+      - name: List IPA output (debugging)
         run: |
           ls -lh src-cordova/platforms/ios/build/device || true
 
-      - name: Upload unsigned IPA as artifact
+      - name: Upload unsigned IPA
         uses: actions/upload-artifact@v4
         with:
           name: ios-ipa-unsigned
