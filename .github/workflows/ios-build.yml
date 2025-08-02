@@ -1,0 +1,48 @@
+name: Build iOS App (Cordova)
+
+on:
+  workflow_dispatch: # Manual trigger
+
+jobs:
+  build-ios:
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Install dependencies
+        run: |
+          npm install -g cordova
+          npm install
+
+      - name: Build Quasar App
+        run: |
+          npm run build -- -m cordova -T ios
+
+      - name: Add Cordova iOS platform (if not committed)
+        run: |
+          cd src-cordova
+          cordova platform add ios
+
+      - name: Install CocoaPods (for native iOS deps)
+        run: |
+          cd src-cordova/platforms/ios
+          pod install
+
+      - name: Build iOS App with Cordova
+        run: |
+          cd src-cordova
+          cordova build ios --device --release
+          
+      - name: Upload IPA (unsigned)
+        uses: actions/upload-artifact@v4
+        with:
+          name: ios-ipa
+          path: |
+            src-cordova/platforms/ios/build/device/*.ipa
