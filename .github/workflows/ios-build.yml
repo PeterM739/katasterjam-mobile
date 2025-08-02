@@ -23,7 +23,7 @@ jobs:
 
       - name: Build Quasar App
         run: |
-          quasar build -m cordova -T ios
+          npm run build -- -m cordova -T ios
 
       - name: Add Cordova iOS platform (if not committed)
         run: |
