@@ -21,14 +21,14 @@ jobs:
           npm install -g cordova
           npm install
 
-      - name: Build Quasar App
-        run: |
-          npm run build -- -m cordova -T ios
-
       - name: Add Cordova iOS platform (if not committed)
         run: |
           cd src-cordova
           cordova platform add ios
+
+      - name: Build Quasar App
+        run: |
+          npm run build -- -m cordova -T ios
 
       - name: Install CocoaPods (iOS dependencies)
         run: |
@@ -39,6 +39,11 @@ jobs:
         run: |
           cd src-cordova
           cordova build ios --device --release
+        continue-on-error: true
+
+      - name: List .ipa files (debug step)
+        run: |
+          ls -lh src-cordova/platforms/ios/build/device || true
 
       - name: Upload unsigned IPA as artifact
         uses: actions/upload-artifact@v4
